@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
 void main() => runApp(MyMaterial(home: MyHome()));
 
@@ -20,16 +21,16 @@ class MyHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Relative Pitch Adjuster')),
+      appBar: AppBar(title: const Text('Relative Pitch Adjuster')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              QuestionNote(name: 'Do', cent: 0),
-              QuestionNote(name: 'Re', cent: 200),
-              QuestionNote(name: 'Ti', cent: -100),
-              QuestionNote(name: 'Do', cent: 0),
+              QuestionNote(relative: Relative.Do4),
+              QuestionNote(relative: Relative.Re4),
+              QuestionNote(relative: Relative.Si3),
+              QuestionNote(relative: Relative.Do4),
             ]),
             SizedBox(
               height: 100,
@@ -37,12 +38,12 @@ class MyHome extends StatelessWidget {
                 itemExtent: 10,
                 children: List.generate(
                   3501,
-                  (i) => Text('-'),
+                  (i) => const Text('-'),
                 ),
               ),
             ),
             RaisedButton(
-              child: Text('OK!'),
+              child: const Text('OK!'),
               onPressed: () {},
             ),
           ],
@@ -53,20 +54,25 @@ class MyHome extends StatelessWidget {
 }
 
 class QuestionNote extends StatelessWidget {
-  QuestionNote({@required this.name, @required this.cent});
-  final String name;
-  final int cent;
+  QuestionNote({@required Relative relative})
+      : note = Note.fromRelative(relative);
+  final Note note;
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(children: [
-        Text(
-          name,
-          style: Theme.of(context).textTheme.display1,
-        ),
-        Text((cent >= 0 ? '+' : '') + cent.toString()),
-      ]),
+    return Container(
+      width: 80,
+      decoration: BoxDecoration(
+          color: note.solfege.color, borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(children: [
+          Text(
+            note.solfege.name,
+            style: Theme.of(context).textTheme.display1,
+          ),
+          Text((note.cent >= 0 ? '+' : '') + note.cent.toString()),
+        ]),
+      ),
     );
   }
 }
