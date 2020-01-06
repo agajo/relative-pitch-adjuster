@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:relative_pitch_adjuster/game_view.dart';
 import 'package:relative_pitch_adjuster/note_container.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
@@ -9,7 +11,16 @@ class QuestionNote extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        NoteContainer(relative: _relative),
+        NoteContainer(
+          relative: _relative,
+          isActive: Provider.of<AnswerNotifier>(context).didAnswer,
+        ),
+        const SizedBox(height: 10),
+        NoteContainer(
+          relative: _relative,
+          showsCent: Provider.of<AnswerNotifier>(context).didAnswer,
+          cent: 300,
+        ),
         Padding(
           padding: const EdgeInsets.only(top: 10),
           child: ShaderMask(
