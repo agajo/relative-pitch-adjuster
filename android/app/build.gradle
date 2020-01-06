@@ -37,7 +37,6 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "work.okaryunoske.relative_pitch_adjuster"
         minSdkVersion 16
         targetSdkVersion 28
