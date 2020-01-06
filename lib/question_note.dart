@@ -12,21 +12,34 @@ class QuestionNote extends StatelessWidget {
         NoteContainer(relative: _relative),
         Padding(
           padding: const EdgeInsets.only(top: 10),
-          child: SizedBox(
-            height: 100,
-            width: 50,
-            child: ListWheelScrollView(
-              itemExtent: 10,
-              diameterRatio: 1.2,
-              children: List.generate(
-                3501,
-                (i) => i % 10 == 0
-                    ? Container(
-                        color: Colors.black87,
-                        child: Center(
-                            child: Container(color: Colors.white, height: 2)),
-                      )
-                    : Container(color: Colors.black87),
+          child: ShaderMask(
+            blendMode: BlendMode.dstIn,
+            shaderCallback: (bounds) {
+              return LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: <Color>[
+                  Colors.transparent,
+                  Colors.white,
+                  Colors.white,
+                  Colors.transparent,
+                ],
+              ).createShader(
+                bounds.shift(-bounds.topLeft),
+              );
+            },
+            child: SizedBox(
+              height: 100,
+              width: 60,
+              child: ListWheelScrollView(
+                itemExtent: 15,
+                children: List.generate(
+                  3501,
+                  (_) => Center(
+                      child: Container(
+                          color: Note.fromRelative(_relative).solfege.color,
+                          height: 7)),
+                ),
               ),
             ),
           ),
