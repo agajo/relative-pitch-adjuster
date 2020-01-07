@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:relative_pitch_adjuster/question_note.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
@@ -16,6 +17,7 @@ class GameView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const AnswerResultGap(),
             Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const <Widget>[
@@ -32,6 +34,25 @@ class GameView extends StatelessWidget {
   }
 }
 
+class AnswerResultGap extends StatelessWidget {
+  const AnswerResultGap({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 40,
+      child: Provider.of<AnswerNotifier>(context).didAnswer
+          ? Text('492',
+              style: GoogleFonts.balooTamma(
+                  textStyle: TextStyle(
+                      fontSize: 30, color: Theme.of(context).errorColor)))
+          : const Text('', style: TextStyle(fontSize: 30)),
+    );
+  }
+}
+
 class OkNextButton extends StatelessWidget {
   const OkNextButton({
     Key key,
@@ -40,7 +61,7 @@ class OkNextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
-      color: Theme.of(context).buttonColor,
+      color: Theme.of(context).accentColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
         padding:

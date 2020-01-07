@@ -11,7 +11,7 @@ class MyMaterial extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Relative Pitch Adjuster',
-      theme: ThemeData.dark().copyWith(buttonColor: Colors.cyan),
+      theme: ThemeData.dark().copyWith(accentColor: Colors.cyan),
       home: home,
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:relative_pitch_adjuster/game_view.dart';
 import 'package:relative_pitch_adjuster/note_container.dart';
@@ -11,8 +12,15 @@ class QuestionNote extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Text('+10', style: Theme.of(context).textTheme.subtitle),
-        const SizedBox(height: 5),
+        SizedBox(
+          height: 25,
+          child: Provider.of<AnswerNotifier>(context).didAnswer
+              ? Text('+123',
+                  style: GoogleFonts.balooTamma(
+                      fontSize: 20,
+                      textStyle: TextStyle(color: Colors.white70)))
+              : const Text('', style: TextStyle(fontSize: 20)),
+        ),
         NoteContainer(
           relative: _relative,
           isActive: Provider.of<AnswerNotifier>(context).didAnswer,
