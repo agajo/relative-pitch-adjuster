@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:relative_pitch_adjuster/question_note.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
+import 'js_caller.dart';
+
 class GameView extends StatelessWidget {
   const GameView({
     Key key,
@@ -11,23 +13,26 @@ class GameView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<AnswerNotifier>(
-      create: (context) => AnswerNotifier(),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const AnswerResultGap(),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const <Widget>[
-                  QuestionNote(relative: Relative.Fa4),
-                  QuestionNote(relative: Relative.Sol4),
-                  QuestionNote(relative: Relative.Si3),
-                  QuestionNote(relative: Relative.Do4),
-                ]),
-            const OkNextButton(),
-          ],
+    return Provider<JsCaller>(
+      create: (context) => JsCaller(),
+      child: ChangeNotifierProvider<AnswerNotifier>(
+        create: (context) => AnswerNotifier(),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const AnswerResultGap(),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const <Widget>[
+                    QuestionNote(relative: Relative.Fa4),
+                    QuestionNote(relative: Relative.Sol4),
+                    QuestionNote(relative: Relative.Si3),
+                    QuestionNote(relative: Relative.Do4),
+                  ]),
+              const OkNextButton(),
+            ],
+          ),
         ),
       ),
     );
