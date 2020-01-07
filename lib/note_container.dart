@@ -33,7 +33,7 @@ class NoteContainer extends StatelessWidget {
               : _do4Frequency * pow(2, _cent / 1200)),
       onPanEnd: (_) => Provider.of<JsCaller>(context, listen: false).stop(),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
+        duration: const Duration(milliseconds: 200),
         width: 80,
         decoration: BoxDecoration(
           color: _isActive ? note.solfege.color : Colors.grey,
