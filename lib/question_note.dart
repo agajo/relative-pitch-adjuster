@@ -29,11 +29,43 @@ class QuestionNote extends StatelessWidget {
           isActive: Provider.of<AnswerNotifier>(context).didAnswer,
         ),
         const SizedBox(height: 10),
+        Answerer(relative: _relative, do4Frequency: _do4Frequency),
+      ],
+    );
+  }
+}
+
+class Answerer extends StatefulWidget {
+  const Answerer({
+    Key key,
+    @required Relative relative,
+    @required double do4Frequency,
+  })  : _relative = relative,
+        _do4Frequency = do4Frequency,
+        super(key: key);
+
+  final Relative _relative;
+  final double _do4Frequency;
+
+  @override
+  _AnswererState createState() => _AnswererState();
+}
+
+class _AnswererState extends State<Answerer> {
+  final int _wheelListItemNumber = 3501;
+  int _answerCent = 0;
+  FixedExtentScrollController _wheelController;
+  @override
+  Widget build(BuildContext context) {
+    _wheelController = FixedExtentScrollController(
+        initialItem: _answerCent + (_wheelListItemNumber - 1) ~/ 2);
+    return Column(
+      children: <Widget>[
         NoteContainer(
-          relative: _relative,
-          do4Frequency: _do4Frequency,
+          relative: widget._relative,
+          do4Frequency: widget._do4Frequency,
           showsCent: Provider.of<AnswerNotifier>(context).didAnswer,
-          cent: 300,
+          cent: _answerCent,
         ),
         Padding(
           padding: const EdgeInsets.only(top: 10),
@@ -41,14 +73,21 @@ class QuestionNote extends StatelessWidget {
             height: 100,
             width: 60,
             child: ListWheelScrollView(
+              controller: _wheelController,
               itemExtent: 15,
               children: List.generate(
                 3501,
                 (_) => Center(
                     child: Container(
-                        color: Note.fromRelative(_relative).solfege.color,
+                        color:
+                            Note.fromRelative(widget._relative).solfege.color,
                         height: 7)),
               ),
+              onSelectedItemChanged: (i) {
+                setState(() {
+                  _answerCent = i - (_wheelListItemNumber - 1) ~/ 2;
+                });
+              },
             ),
           ),
         ),

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
@@ -25,8 +27,10 @@ class NoteContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO(madao): I want to just detect "touch". but I can't. still problem.
     return GestureDetector(
-      onPanStart: (_) => Provider.of<JsCaller>(context, listen: false)
-          .play(note.frequency(do4Frequency: _do4Frequency)),
+      onPanStart: (_) => Provider.of<JsCaller>(context, listen: false).play(
+          _cent == null
+              ? note.frequency(do4Frequency: _do4Frequency)
+              : _do4Frequency * pow(2, _cent / 1200)),
       onPanEnd: (_) => Provider.of<JsCaller>(context, listen: false).stop(),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 100),
