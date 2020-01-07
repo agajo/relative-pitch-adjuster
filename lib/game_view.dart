@@ -60,23 +60,23 @@ class OkNextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RaisedButton(
-      color: Theme.of(context).accentColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding:
-            const EdgeInsets.only(right: 30, left: 30, top: 10, bottom: 10),
+    return ButtonTheme(
+      minWidth: 120,
+      height: 40,
+      child: RaisedButton(
+        color: Theme.of(context).accentColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        onPressed: () {
+          if (Provider.of<AnswerNotifier>(context, listen: false).didAnswer) {
+            Provider.of<AnswerNotifier>(context, listen: false).next();
+          } else {
+            Provider.of<AnswerNotifier>(context, listen: false).answer();
+          }
+        },
         child: Provider.of<AnswerNotifier>(context).didAnswer
             ? const Text('Next')
             : const Text('OK!'),
       ),
-      onPressed: () {
-        if (Provider.of<AnswerNotifier>(context, listen: false).didAnswer) {
-          Provider.of<AnswerNotifier>(context, listen: false).next();
-        } else {
-          Provider.of<AnswerNotifier>(context, listen: false).answer();
-        }
-      },
     );
   }
 }
