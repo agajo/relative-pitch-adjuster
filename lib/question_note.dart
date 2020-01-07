@@ -11,6 +11,8 @@ class QuestionNote extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
+        Text('+10', style: Theme.of(context).textTheme.subtitle),
+        const SizedBox(height: 5),
         NoteContainer(
           relative: _relative,
           isActive: Provider.of<AnswerNotifier>(context).didAnswer,

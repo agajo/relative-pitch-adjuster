@@ -14,7 +14,8 @@ class NoteContainer extends StatelessWidget {
   final bool _showsCent;
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 100),
       width: 80,
       decoration: BoxDecoration(
         color: _isActive ? note.solfege.color : Colors.grey,

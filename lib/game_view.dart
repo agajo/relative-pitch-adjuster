@@ -10,7 +10,7 @@ class GameView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return ChangeNotifierProvider<AnswerNotifier>(
       create: (context) => AnswerNotifier(),
       child: Center(
         child: Column(
@@ -19,8 +19,8 @@ class GameView extends StatelessWidget {
             Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const <Widget>[
-                  QuestionNote(relative: Relative.Do4),
-                  QuestionNote(relative: Relative.Re4),
+                  QuestionNote(relative: Relative.Fa4),
+                  QuestionNote(relative: Relative.Sol4),
                   QuestionNote(relative: Relative.Si3),
                   QuestionNote(relative: Relative.Do4),
                 ]),
@@ -50,10 +50,10 @@ class OkNextButton extends StatelessWidget {
             : const Text('OK!'),
       ),
       onPressed: () {
-        if (Provider.of<AnswerNotifier>(context).didAnswer) {
-          Provider.of<AnswerNotifier>(context).next();
+        if (Provider.of<AnswerNotifier>(context, listen: false).didAnswer) {
+          Provider.of<AnswerNotifier>(context, listen: false).next();
         } else {
-          Provider.of<AnswerNotifier>(context).answer();
+          Provider.of<AnswerNotifier>(context, listen: false).answer();
         }
       },
     );
@@ -61,7 +61,7 @@ class OkNextButton extends StatelessWidget {
 }
 
 class AnswerNotifier extends ChangeNotifier {
-  bool _didAnswer = false;
+  bool _didAnswer = true;
   bool get didAnswer => _didAnswer;
 
   void answer() {
