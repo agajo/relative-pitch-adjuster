@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:relative_pitch_adjuster/question_note.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
@@ -50,9 +49,8 @@ class AnswerResultGap extends StatelessWidget {
       height: 40,
       child: Provider.of<AnswerNotifier>(context).didAnswer
           ? Text('492',
-              style: GoogleFonts.balooTamma(
-                  textStyle: TextStyle(
-                      fontSize: 30, color: Theme.of(context).errorColor)))
+              style:
+                  TextStyle(fontSize: 30, color: Theme.of(context).errorColor))
           : const Text('', style: TextStyle(fontSize: 30)),
     );
   }
