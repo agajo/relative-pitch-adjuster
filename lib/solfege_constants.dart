@@ -12,8 +12,9 @@ class Solfege {
   Color get color => _color;
   // ignore:, constant_identifier_names
   static const Re = Solfege._internal(name: 'Re', color: Colors.orange);
-  // ignore:, constant_identifier_names
-  static const Mi = Solfege._internal(name: 'Mi', color: Colors.yellow);
+  // ignore:, constant_identifier_names, non_constant_identifier_names
+  static final Solfege Mi =
+      Solfege._internal(name: 'Mi', color: Colors.yellow[600]);
   // ignore:, constant_identifier_names
   static const Fa = Solfege._internal(name: 'Fa', color: Colors.green);
   // ignore:, constant_identifier_names
@@ -114,5 +115,5 @@ class Note {
   }
   final Solfege solfege;
   final int cent;
-  double frequency(double do4Frequency) => do4Frequency * pow(2, cent / 1200);
+  double frequency({double do4Frequency}) => do4Frequency * pow(2, cent / 1200);
 }

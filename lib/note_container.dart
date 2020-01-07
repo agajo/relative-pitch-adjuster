@@ -22,7 +22,7 @@ class NoteContainer extends StatelessWidget {
       onPanStart: (_) =>
           // TODO(madao): set do4frequency
           Provider.of<JsCaller>(context, listen: false)
-              .play(note.frequency(440)),
+              .play(note.frequency(do4Frequency: 440)),
       onPanEnd: (_) => Provider.of<JsCaller>(context, listen: false).stop(),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 100),
