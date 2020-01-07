@@ -106,7 +106,7 @@ class Note {
         return Note._internal(Solfege.Si, 1100);
         break;
       case Relative.Do5:
-        return Note._internal(Solfege.Si, 1200);
+        return Note._internal(Solfege.Do, 1200);
         break;
       default:
         throw StateError('Unexpected Relative');
