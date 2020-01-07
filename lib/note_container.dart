@@ -5,13 +5,19 @@ import 'package:relative_pitch_adjuster/solfege_constants.dart';
 import 'js_caller.dart';
 
 class NoteContainer extends StatelessWidget {
-  NoteContainer(
-      {@required Relative relative, int cent, bool isActive, bool showsCent})
-      : note = Note.fromRelative(relative),
+  NoteContainer({
+    @required Relative relative,
+    @required double do4Frequency,
+    int cent,
+    bool isActive,
+    bool showsCent,
+  })  : note = Note.fromRelative(relative),
+        _do4Frequency = do4Frequency,
         _cent = cent ?? Note.fromRelative(relative).cent,
         _isActive = isActive ?? true,
         _showsCent = showsCent ?? true;
   final Note note;
+  final double _do4Frequency;
   final int _cent;
   final bool _isActive;
   final bool _showsCent;
@@ -19,10 +25,8 @@ class NoteContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO(madao): I want to just detect "touch". but I can't. still problem.
     return GestureDetector(
-      onPanStart: (_) =>
-          // TODO(madao): set do4frequency
-          Provider.of<JsCaller>(context, listen: false)
-              .play(note.frequency(do4Frequency: 440)),
+      onPanStart: (_) => Provider.of<JsCaller>(context, listen: false)
+          .play(note.frequency(do4Frequency: _do4Frequency)),
       onPanEnd: (_) => Provider.of<JsCaller>(context, listen: false).stop(),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 100),

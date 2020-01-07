@@ -5,8 +5,13 @@ import 'package:relative_pitch_adjuster/question.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
 class QuestionNote extends StatelessWidget {
-  const QuestionNote({@required Relative relative}) : _relative = relative;
+  const QuestionNote({
+    @required Relative relative,
+    @required double do4Frequency,
+  })  : _relative = relative,
+        _do4Frequency = do4Frequency;
   final Relative _relative;
+  final double _do4Frequency;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -20,11 +25,13 @@ class QuestionNote extends StatelessWidget {
         ),
         NoteContainer(
           relative: _relative,
+          do4Frequency: _do4Frequency,
           isActive: Provider.of<AnswerNotifier>(context).didAnswer,
         ),
         const SizedBox(height: 10),
         NoteContainer(
           relative: _relative,
+          do4Frequency: _do4Frequency,
           showsCent: Provider.of<AnswerNotifier>(context).didAnswer,
           cent: 300,
         ),

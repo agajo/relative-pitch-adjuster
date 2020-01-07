@@ -25,10 +25,13 @@ class Question extends StatelessWidget {
           children: [
             const AnswerResultGap(),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-              QuestionNote(relative: _relatives[0]),
-              QuestionNote(relative: _relatives[1]),
-              QuestionNote(relative: _relatives[2]),
-              const QuestionNote(relative: Relative.Do4),
+              QuestionNote(
+                  relative: _relatives[0], do4Frequency: _do4Frequency),
+              QuestionNote(
+                  relative: _relatives[1], do4Frequency: _do4Frequency),
+              QuestionNote(
+                  relative: _relatives[2], do4Frequency: _do4Frequency),
+              QuestionNote(relative: Relative.Do4, do4Frequency: _do4Frequency),
             ]),
             const OkNextButton(),
           ],
