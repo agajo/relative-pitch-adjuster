@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:relative_pitch_adjuster/question.dart';
+import 'package:relative_pitch_adjuster/question_notifier.dart';
 
 import 'js_caller.dart';
 
@@ -13,20 +14,10 @@ class GameView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Provider<JsCaller>(
       create: (context) => JsCaller(),
-      child: ChangeNotifierProvider<QuestionGiver>(
-        create: (_) => QuestionGiver(),
-        child: Consumer<QuestionGiver>(
-            builder: (_, questionGiver, ___) => questionGiver.question),
+      child: ChangeNotifierProvider<QuestionNotifier>(
+        create: (_) => QuestionNotifier(),
+        child: Question(),
       ),
     );
-  }
-}
-
-class QuestionGiver extends ChangeNotifier {
-  Question _question = Question(key: UniqueKey());
-  Question get question => _question;
-  void giveNextQuestion() {
-    _question = Question(key: UniqueKey());
-    notifyListeners();
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:relative_pitch_adjuster/answer_notifier.dart';
 import 'package:relative_pitch_adjuster/answerer.dart';
 import 'package:relative_pitch_adjuster/note_container.dart';
+import 'package:relative_pitch_adjuster/question_notifier.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
 class QuestionNote extends StatelessWidget {
@@ -25,9 +25,9 @@ class QuestionNote extends StatelessWidget {
       children: <Widget>[
         SizedBox(
           height: 25,
-          child: Provider.of<AnswerNotifier>(context).didAnswer
+          child: Provider.of<QuestionNotifier>(context).didAnswer
               ? Text(
-                  Provider.of<AnswerNotifier>(context)
+                  Provider.of<QuestionNotifier>(context)
                           .oneDifferenceText(_noteIndex) ??
                       '',
                   style: TextStyle(fontSize: 20, color: Colors.white70))
@@ -36,7 +36,7 @@ class QuestionNote extends StatelessWidget {
         NoteContainer(
           relative: _relative,
           do4Frequency: _do4Frequency,
-          isActive: Provider.of<AnswerNotifier>(context).didAnswer,
+          isActive: Provider.of<QuestionNotifier>(context).didAnswer,
         ),
         const SizedBox(height: 10),
         Answerer(

@@ -1,71 +1,61 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:relative_pitch_adjuster/answer_notifier.dart';
-import 'package:relative_pitch_adjuster/game_view.dart';
 import 'package:relative_pitch_adjuster/question_note.dart';
+import 'package:relative_pitch_adjuster/question_notifier.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
-// 1問1問に相当するWidget。
-// このWidgetを新しく作って出題し、次の問題に行く時に結果だけ受け取って破棄。
 class Question extends StatelessWidget {
   Question({Key key}) : super(key: key);
-  final double _do4Frequency =
-      440 * pow(2, (Random().nextDouble() * 11 - 9) / 12).toDouble();
-  final List<int> _relativeIndexes = _generateRelativeIndexes();
 
   @override
   Widget build(BuildContext context) {
-    final _relatives = _relativeIndexes.map((n) => Relative.values[n]).toList();
-    return ChangeNotifierProvider<AnswerNotifier>(
-      create: (context) => AnswerNotifier(
-          correctCents: _relatives
-                  .map((relative) => Note.fromRelative(relative).cent)
-                  .toList() +
-              [0]),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const AnswerResultGap(),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-              QuestionNote(
-                relative: _relatives[0],
-                do4Frequency: _do4Frequency,
-                noteIndex: 0,
-              ),
-              QuestionNote(
-                relative: _relatives[1],
-                do4Frequency: _do4Frequency,
-                noteIndex: 1,
-              ),
-              QuestionNote(
-                relative: _relatives[2],
-                do4Frequency: _do4Frequency,
-                noteIndex: 2,
-              ),
-              QuestionNote(
-                relative: Relative.Do4,
-                do4Frequency: _do4Frequency,
-                isScrollable: false,
-                noteIndex: 3,
-              ),
-            ]),
-            ButtonTheme(
-              minWidth: 120,
-              height: 40,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const <Widget>[
-                  HideCentButton(),
-                  SizedBox(width: 20),
-                  OkNextButton(),
-                ],
-              ),
+    print('rebuild Question Widget');
+    final _relatives = Provider.of<QuestionNotifier>(context)
+        .relativeIndexes
+        .map((n) => Relative.values[n])
+        .toList();
+    final _do4Frequency = Provider.of<QuestionNotifier>(context).do4Frequency;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const AnswerResultGap(),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+            QuestionNote(
+              relative: _relatives[0],
+              do4Frequency: _do4Frequency,
+              noteIndex: 0,
             ),
-          ],
-        ),
+            QuestionNote(
+              relative: _relatives[1],
+              do4Frequency: _do4Frequency,
+              noteIndex: 1,
+            ),
+            QuestionNote(
+              relative: _relatives[2],
+              do4Frequency: _do4Frequency,
+              noteIndex: 2,
+            ),
+            QuestionNote(
+              relative: Relative.Do4,
+              do4Frequency: _do4Frequency,
+              isScrollable: false,
+              noteIndex: 3,
+            ),
+          ]),
+          ButtonTheme(
+            minWidth: 120,
+            height: 40,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const <Widget>[
+                HideCentButton(),
+                SizedBox(width: 20),
+                OkNextButton(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -80,9 +70,9 @@ class AnswerResultGap extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 40,
-      child: Provider.of<AnswerNotifier>(context).didAnswer
+      child: Provider.of<QuestionNotifier>(context).didAnswer
           ? Text(
-              Provider.of<AnswerNotifier>(context).totalDifference.toString(),
+              Provider.of<QuestionNotifier>(context).totalDifference.toString(),
               style:
                   TextStyle(fontSize: 30, color: Theme.of(context).errorColor))
           : const Text('', style: TextStyle(fontSize: 30)),
@@ -101,49 +91,17 @@ class OkNextButton extends StatelessWidget {
       color: Theme.of(context).accentColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       onPressed: () {
-        if (Provider.of<AnswerNotifier>(context, listen: false).didAnswer) {
-          Provider.of<QuestionGiver>(context, listen: false).giveNextQuestion();
+        if (Provider.of<QuestionNotifier>(context, listen: false).didAnswer) {
+          Provider.of<QuestionNotifier>(context, listen: false).goToNext();
         } else {
-          Provider.of<AnswerNotifier>(context, listen: false).answer();
+          Provider.of<QuestionNotifier>(context, listen: false).answer();
         }
       },
-      child: Provider.of<AnswerNotifier>(context).didAnswer
+      child: Provider.of<QuestionNotifier>(context).didAnswer
           ? const Text('Next')
           : const Text('OK!'),
     );
   }
-}
-
-List<int> _generateRelativeIndexes() {
-  bool _isOK;
-  List<int> _temp;
-  do {
-    _isOK = true;
-    _temp =
-        List.generate(3, (_) => Random().nextInt(Relative.values.length - 1))
-            .toList();
-    if (_temp.last == Relative.Do4.index ||
-        (_temp.last - Relative.Do4.index).abs() > 4) {
-      _isOK = false;
-    }
-    if (_temp.last == Relative.Fa3.index ||
-        _temp.last == Relative.La3.index ||
-        _temp.last == Relative.Fa4.index ||
-        _temp.last == Relative.La4.index) {
-      _isOK = false;
-    }
-    for (var i = 0; i < _temp.length - 1; i++) {
-      if ((_temp[i] - _temp[i + 1]).abs() > 4) {
-        _isOK = false;
-        break;
-      }
-      if (_temp[i] == _temp[i + 1]) {
-        _isOK = false;
-        break;
-      }
-    }
-  } while (_isOK == false);
-  return _temp;
 }
 
 class HideCentButton extends StatelessWidget {
@@ -154,8 +112,8 @@ class HideCentButton extends StatelessWidget {
       color: Theme.of(context).splashColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: const Text('Hide Cent'),
-      onPressed: Provider.of<AnswerNotifier>(context).didAnswer
-          ? Provider.of<AnswerNotifier>(context, listen: false)
+      onPressed: Provider.of<QuestionNotifier>(context).didAnswer
+          ? Provider.of<QuestionNotifier>(context, listen: false)
               .toggleShowCentsInAnswer
           : null,
     );
