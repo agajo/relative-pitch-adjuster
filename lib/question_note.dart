@@ -18,26 +18,44 @@ class QuestionNote extends StatelessWidget {
   final bool _isScrollable;
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        SizedBox(
-          height: 25,
-          child: Provider.of<AnswerNotifier>(context).didAnswer
-              ? Text('+123',
-                  style: TextStyle(fontSize: 20, color: Colors.white70))
-              : const Text('', style: TextStyle(fontSize: 20)),
-        ),
-        NoteContainer(
-          relative: _relative,
-          do4Frequency: _do4Frequency,
-          isActive: Provider.of<AnswerNotifier>(context).didAnswer,
-        ),
-        const SizedBox(height: 10),
-        Answerer(
+    return Provider<DifferenceReporter>(
+      create: (context) =>
+          DifferenceReporter(correctCent: Note.fromRelative(_relative).cent),
+      child: Column(
+        children: <Widget>[
+          SizedBox(
+            height: 25,
+            child: Provider.of<AnswerNotifier>(context).didAnswer
+                ? Consumer<DifferenceReporter>(
+                    builder: (_, differenceReporter, __) => Text(
+                        differenceReporter.differenceString ?? '',
+                        style: TextStyle(fontSize: 20, color: Colors.white70)),
+                  )
+                : const Text('', style: TextStyle(fontSize: 20)),
+          ),
+          NoteContainer(
             relative: _relative,
             do4Frequency: _do4Frequency,
-            isScrollable: _isScrollable),
-      ],
+            isActive: Provider.of<AnswerNotifier>(context).didAnswer,
+          ),
+          const SizedBox(height: 10),
+          Answerer(
+              relative: _relative,
+              do4Frequency: _do4Frequency,
+              isScrollable: _isScrollable),
+        ],
+      ),
     );
+  }
+}
+
+class DifferenceReporter {
+  DifferenceReporter({@required int correctCent}) : _correctCent = correctCent;
+  final int _correctCent;
+  int currentAnswerCent = 0;
+  String get differenceString {
+    final _diff = currentAnswerCent - _correctCent;
+    final _prefix = _diff >= 0 ? '+' : '';
+    return '$_prefix${_diff.toString()}';
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:relative_pitch_adjuster/note_container.dart';
 import 'package:relative_pitch_adjuster/question.dart';
+import 'package:relative_pitch_adjuster/question_note.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
 import 'js_caller.dart';
@@ -82,6 +83,8 @@ class _AnswererState extends State<Answerer> {
                         widget._do4Frequency * pow(2, _answerCent / 1200);
                     Provider.of<JsCaller>(context, listen: false)
                         .playLong(_frequency);
+                    Provider.of<DifferenceReporter>(context, listen: false)
+                        .currentAnswerCent = _answerCent;
                   });
                 },
               ),
