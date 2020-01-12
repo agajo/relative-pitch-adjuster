@@ -108,15 +108,29 @@ List<int> _generateRelativeIndexes() {
     _temp =
         List.generate(3, (_) => Random().nextInt(Relative.values.length - 1))
             .toList();
-    if (_temp.last == 0 || _temp.last.abs() > 7) {
+    print(_temp);
+    if (_temp.last == Relative.Do4.index ||
+        (_temp.last - Relative.Do4.index).abs() > 4) {
+      print('NG!! about last note');
+      _isOK = false;
+    }
+    if (_temp.last == Relative.Fa3.index ||
+        _temp.last == Relative.La3.index ||
+        _temp.last == Relative.Fa4.index ||
+        _temp.last == Relative.La4.index) {
+      print('NG!! the last note is Fa or La');
       _isOK = false;
     }
     for (var i = 0; i < _temp.length - 1; i++) {
-      if ((_temp[i] - _temp[i + 1]).abs() > 7) {
+      if ((_temp[i] - _temp[i + 1]).abs() > 4) {
+        print('NG!! note $i difference is too big');
         _isOK = false;
+        break;
       }
-      if ((_temp[i]) == _temp[i + 1]) {
+      if (_temp[i] == _temp[i + 1]) {
+        print('NG!! note $i is the same as the next');
         _isOK = false;
+        break;
       }
     }
   } while (_isOK == false);
