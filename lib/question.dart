@@ -29,7 +29,10 @@ class Question extends StatelessWidget {
                   relative: _relatives[1], do4Frequency: _do4Frequency),
               QuestionNote(
                   relative: _relatives[2], do4Frequency: _do4Frequency),
-              QuestionNote(relative: Relative.Do4, do4Frequency: _do4Frequency),
+              QuestionNote(
+                  relative: Relative.Do4,
+                  do4Frequency: _do4Frequency,
+                  isScrollable: false),
             ]),
             const OkNextButton(),
           ],

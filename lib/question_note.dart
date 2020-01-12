@@ -9,10 +9,13 @@ class QuestionNote extends StatelessWidget {
   const QuestionNote({
     @required Relative relative,
     @required double do4Frequency,
+    bool isScrollable,
   })  : _relative = relative,
-        _do4Frequency = do4Frequency;
+        _do4Frequency = do4Frequency,
+        _isScrollable = isScrollable ?? true;
   final Relative _relative;
   final double _do4Frequency;
+  final bool _isScrollable;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -30,7 +33,10 @@ class QuestionNote extends StatelessWidget {
           isActive: Provider.of<AnswerNotifier>(context).didAnswer,
         ),
         const SizedBox(height: 10),
-        Answerer(relative: _relative, do4Frequency: _do4Frequency),
+        Answerer(
+            relative: _relative,
+            do4Frequency: _do4Frequency,
+            isScrollable: _isScrollable),
       ],
     );
   }

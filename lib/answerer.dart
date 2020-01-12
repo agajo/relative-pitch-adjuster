@@ -13,12 +13,15 @@ class Answerer extends StatefulWidget {
     Key key,
     @required Relative relative,
     @required double do4Frequency,
+    @required bool isScrollable,
   })  : _relative = relative,
         _do4Frequency = do4Frequency,
+        _isScrollable = isScrollable,
         super(key: key);
 
   final Relative _relative;
   final double _do4Frequency;
+  final bool _isScrollable;
 
   @override
   _AnswererState createState() => _AnswererState();
@@ -58,12 +61,18 @@ class _AnswererState extends State<Answerer> {
               child: ListWheelScrollView(
                 controller: _wheelController,
                 itemExtent: 15,
+                physics: widget._isScrollable
+                    ? const AlwaysScrollableScrollPhysics()
+                    : const NeverScrollableScrollPhysics(),
                 children: List.generate(
                   3501,
                   (_) => Center(
                       child: Container(
-                          color:
-                              Note.fromRelative(widget._relative).solfege.color,
+                          color: widget._isScrollable
+                              ? Note.fromRelative(widget._relative)
+                                  .solfege
+                                  .color
+                              : Colors.grey,
                           height: 7)),
                 ),
                 onSelectedItemChanged: (i) {
