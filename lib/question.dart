@@ -10,10 +10,8 @@ import 'package:relative_pitch_adjuster/solfege_constants.dart';
 class Question extends StatelessWidget {
   final double _do4Frequency =
       440 * pow(2, (Random().nextDouble() * 11 - 9) / 12).toDouble();
-  // TODO(madao): 音が急にぶっとばないように条件つけて調整。
-  final List<int> _relativeIndexes =
-      List.generate(3, (_) => Random().nextInt(Relative.values.length - 1))
-          .toList();
+  final List<int> _relativeIndexes = _generateRelativeIndexes();
+
   @override
   Widget build(BuildContext context) {
     final _relatives = _relativeIndexes.map((n) => Relative.values[n]).toList();
@@ -100,4 +98,27 @@ class AnswerNotifier extends ChangeNotifier {
     _didAnswer = false;
     notifyListeners();
   }
+}
+
+List<int> _generateRelativeIndexes() {
+  bool _isOK;
+  List<int> _temp;
+  do {
+    _isOK = true;
+    _temp =
+        List.generate(3, (_) => Random().nextInt(Relative.values.length - 1))
+            .toList();
+    if (_temp.last == 0 || _temp.last.abs() > 7) {
+      _isOK = false;
+    }
+    for (var i = 0; i < _temp.length - 1; i++) {
+      if ((_temp[i] - _temp[i + 1]).abs() > 7) {
+        _isOK = false;
+      }
+      if ((_temp[i]) == _temp[i + 1]) {
+        _isOK = false;
+      }
+    }
+  } while (_isOK == false);
+  return _temp;
 }
