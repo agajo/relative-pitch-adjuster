@@ -5,7 +5,7 @@ import 'package:relative_pitch_adjuster/question_notifier.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
 class Question extends StatelessWidget {
-  Question({Key key}) : super(key: key);
+  const Question({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

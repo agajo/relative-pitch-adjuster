@@ -16,7 +16,7 @@ class GameView extends StatelessWidget {
       create: (context) => JsCaller(),
       child: ChangeNotifierProvider<QuestionNotifier>(
         create: (_) => QuestionNotifier(),
-        child: Question(),
+        child: const Question(),
       ),
     );
   }
