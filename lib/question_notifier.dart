@@ -16,6 +16,7 @@ class QuestionNotifier extends ChangeNotifier {
   double get do4Frequency => _do4Frequency;
   List<int> _relativeIndexes;
   List<int> _correctCents;
+  List<int> get correctCents => _correctCents;
   List<int> get relativeIndexes => _relativeIndexes;
 
   void setAnswerCent(int index, int answerCent) {

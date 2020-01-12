@@ -9,7 +9,6 @@ class Question extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('rebuild Question Widget');
     final _relatives = Provider.of<QuestionNotifier>(context)
         .relativeIndexes
         .map((n) => Relative.values[n])

@@ -32,13 +32,25 @@ class Answerer extends StatefulWidget {
 
 class _AnswererState extends State<Answerer> {
   final int _wheelListItemNumber = 3501;
-  int _answerCent = 0;
+  int _answerCent;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setState(() {
+      _answerCent = Provider.of<QuestionNotifier>(context, listen: false)
+          .correctCents[widget._noteIndex];
+      _wheelController = FixedExtentScrollController(
+          initialItem: _answerCent + (_wheelListItemNumber - 1) ~/ 2);
+      _wheelController
+          .jumpToItem(_answerCent + (_wheelListItemNumber - 1) ~/ 2);
+    });
+  }
+
   FixedExtentScrollController _wheelController;
   double _frequency;
   @override
   Widget build(BuildContext context) {
-    _wheelController = FixedExtentScrollController(
-        initialItem: _answerCent + (_wheelListItemNumber - 1) ~/ 2);
     _frequency = widget._do4Frequency * pow(2, _answerCent / 1200);
     return Column(
       children: <Widget>[
@@ -63,6 +75,9 @@ class _AnswererState extends State<Answerer> {
               height: 100,
               width: 60,
               child: ListWheelScrollView(
+                // TODO(madao): これだめ！スクロールするたびに、ホイールが新しいエレメントで置き換えられて、スムーズにスクロールしない。
+                // 次の問題に行った時にだけ、ホイールの位置を変更する処理をかける。
+                // key: UniqueKey(),
                 controller: _wheelController,
                 itemExtent: 15,
                 physics: widget._isScrollable
