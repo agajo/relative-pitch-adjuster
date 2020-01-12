@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:relative_pitch_adjuster/answer_notifier.dart';
 import 'package:relative_pitch_adjuster/answerer.dart';
 import 'package:relative_pitch_adjuster/note_container.dart';
-import 'package:relative_pitch_adjuster/question.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
 class QuestionNote extends StatelessWidget {

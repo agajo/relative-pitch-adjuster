@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:relative_pitch_adjuster/answer_notifier.dart';
 import 'package:relative_pitch_adjuster/note_container.dart';
-import 'package:relative_pitch_adjuster/question.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
 import 'js_caller.dart';
@@ -45,7 +45,8 @@ class _AnswererState extends State<Answerer> {
         NoteContainer(
           relative: widget._relative,
           do4Frequency: widget._do4Frequency,
-          showsCent: Provider.of<AnswerNotifier>(context).didAnswer,
+          showsCent: Provider.of<AnswerNotifier>(context).didAnswer &&
+              Provider.of<AnswerNotifier>(context).doShowCentInAnswer,
           cent: _answerCent,
         ),
         Padding(

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:relative_pitch_adjuster/answer_notifier.dart';
 import 'package:relative_pitch_adjuster/question_note.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
@@ -49,7 +50,18 @@ class Question extends StatelessWidget {
                 noteIndex: 3,
               ),
             ]),
-            const OkNextButton(),
+            ButtonTheme(
+              minWidth: 120,
+              height: 40,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const <Widget>[
+                  HideCentButton(),
+                  SizedBox(width: 20),
+                  OkNextButton(),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -83,61 +95,20 @@ class OkNextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ButtonTheme(
-      minWidth: 120,
-      height: 40,
-      child: RaisedButton(
-        color: Theme.of(context).accentColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        onPressed: () {
-          if (Provider.of<AnswerNotifier>(context, listen: false).didAnswer) {
-            Provider.of<AnswerNotifier>(context, listen: false).next();
-          } else {
-            Provider.of<AnswerNotifier>(context, listen: false).answer();
-          }
-        },
-        child: Provider.of<AnswerNotifier>(context).didAnswer
-            ? const Text('Next')
-            : const Text('OK!'),
-      ),
+    return RaisedButton(
+      color: Theme.of(context).accentColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      onPressed: () {
+        if (Provider.of<AnswerNotifier>(context, listen: false).didAnswer) {
+          Provider.of<AnswerNotifier>(context, listen: false).next();
+        } else {
+          Provider.of<AnswerNotifier>(context, listen: false).answer();
+        }
+      },
+      child: Provider.of<AnswerNotifier>(context).didAnswer
+          ? const Text('Next')
+          : const Text('OK!'),
     );
-  }
-}
-
-class AnswerNotifier extends ChangeNotifier {
-  AnswerNotifier({@required List<int> correctCents})
-      : _correctCents = correctCents;
-  bool _didAnswer = true;
-  bool get didAnswer => _didAnswer;
-  final List<int> _correctCents;
-  final List<int> _answerCents = List.filled(3 + 1, 0);
-
-  void setAnswerCent(int index, int answerCent) {
-    _answerCents[index] = answerCent;
-  }
-
-  String oneDifferenceText(int index) {
-    final _diff = _answerCents[index] - _correctCents[index];
-    final _prefix = _diff >= 0 ? '+' : '';
-    return '$_prefix${_diff.toString()}';
-  }
-
-  int get totalDifference {
-    var _temp = 0;
-    for (var i = 0; i < 3; i++) {
-      _temp = _temp + (_answerCents[i] - _correctCents[i]).abs();
-    }
-    return _temp;
-  }
-
-  void answer() {
-    _didAnswer = true;
-    notifyListeners();
-  }
-
-  void next() {
-    _didAnswer = false;
-    notifyListeners();
   }
 }
 
@@ -172,4 +143,20 @@ List<int> _generateRelativeIndexes() {
     }
   } while (_isOK == false);
   return _temp;
+}
+
+class HideCentButton extends StatelessWidget {
+  const HideCentButton();
+  @override
+  Widget build(BuildContext context) {
+    return RaisedButton(
+      color: Theme.of(context).splashColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: const Text('Hide Cent'),
+      onPressed: Provider.of<AnswerNotifier>(context).didAnswer
+          ? Provider.of<AnswerNotifier>(context, listen: false)
+              .toggleShowCentsInAnswer
+          : null,
+    );
+  }
 }
