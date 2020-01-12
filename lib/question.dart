@@ -3,12 +3,14 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:relative_pitch_adjuster/answer_notifier.dart';
+import 'package:relative_pitch_adjuster/game_view.dart';
 import 'package:relative_pitch_adjuster/question_note.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
 // 1問1問に相当するWidget。
 // このWidgetを新しく作って出題し、次の問題に行く時に結果だけ受け取って破棄。
 class Question extends StatelessWidget {
+  Question({Key key}) : super(key: key);
   final double _do4Frequency =
       440 * pow(2, (Random().nextDouble() * 11 - 9) / 12).toDouble();
   final List<int> _relativeIndexes = _generateRelativeIndexes();
@@ -100,7 +102,7 @@ class OkNextButton extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       onPressed: () {
         if (Provider.of<AnswerNotifier>(context, listen: false).didAnswer) {
-          Provider.of<AnswerNotifier>(context, listen: false).next();
+          Provider.of<QuestionGiver>(context, listen: false).giveNextQuestion();
         } else {
           Provider.of<AnswerNotifier>(context, listen: false).answer();
         }
@@ -120,7 +122,6 @@ List<int> _generateRelativeIndexes() {
     _temp =
         List.generate(3, (_) => Random().nextInt(Relative.values.length - 1))
             .toList();
-    print(_temp);
     if (_temp.last == Relative.Do4.index ||
         (_temp.last - Relative.Do4.index).abs() > 4) {
       _isOK = false;

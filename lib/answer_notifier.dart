@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AnswerNotifier extends ChangeNotifier {
   AnswerNotifier({@required List<int> correctCents})
       : _correctCents = correctCents;
-  bool _didAnswer = true;
+  bool _didAnswer = false;
   bool get didAnswer => _didAnswer;
   bool _doShowCentInAnswer = true;
   bool get doShowCentInAnswer => _doShowCentInAnswer;
@@ -30,11 +30,6 @@ class AnswerNotifier extends ChangeNotifier {
 
   void answer() {
     _didAnswer = true;
-    notifyListeners();
-  }
-
-  void next() {
-    _didAnswer = false;
     notifyListeners();
   }
 

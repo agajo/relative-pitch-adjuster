@@ -13,7 +13,20 @@ class GameView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Provider<JsCaller>(
       create: (context) => JsCaller(),
-      child: Question(),
+      child: ChangeNotifierProvider<QuestionGiver>(
+        create: (_) => QuestionGiver(),
+        child: Consumer<QuestionGiver>(
+            builder: (_, questionGiver, ___) => questionGiver.question),
+      ),
     );
+  }
+}
+
+class QuestionGiver extends ChangeNotifier {
+  Question _question = Question(key: UniqueKey());
+  Question get question => _question;
+  void giveNextQuestion() {
+    _question = Question(key: UniqueKey());
+    notifyListeners();
   }
 }
