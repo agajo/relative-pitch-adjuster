@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:relative_pitch_adjuster/note_container.dart';
 import 'package:relative_pitch_adjuster/question.dart';
-import 'package:relative_pitch_adjuster/question_note.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
 import 'js_caller.dart';
@@ -12,14 +11,17 @@ import 'js_caller.dart';
 class Answerer extends StatefulWidget {
   const Answerer({
     Key key,
+    @required int noteIndex,
     @required Relative relative,
     @required double do4Frequency,
     @required bool isScrollable,
-  })  : _relative = relative,
+  })  : _noteIndex = noteIndex,
+        _relative = relative,
         _do4Frequency = do4Frequency,
         _isScrollable = isScrollable,
         super(key: key);
 
+  final int _noteIndex;
   final Relative _relative;
   final double _do4Frequency;
   final bool _isScrollable;
@@ -83,8 +85,8 @@ class _AnswererState extends State<Answerer> {
                         widget._do4Frequency * pow(2, _answerCent / 1200);
                     Provider.of<JsCaller>(context, listen: false)
                         .playLong(_frequency);
-                    Provider.of<DifferenceReporter>(context, listen: false)
-                        .currentAnswerCent = _answerCent;
+                    Provider.of<AnswerNotifier>(context, listen: false)
+                        .setAnswerCent(widget._noteIndex, _answerCent);
                   });
                 },
               ),

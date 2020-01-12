@@ -16,7 +16,11 @@ class Question extends StatelessWidget {
   Widget build(BuildContext context) {
     final _relatives = _relativeIndexes.map((n) => Relative.values[n]).toList();
     return ChangeNotifierProvider<AnswerNotifier>(
-      create: (context) => AnswerNotifier(),
+      create: (context) => AnswerNotifier(
+          correctCents: _relatives
+                  .map((relative) => Note.fromRelative(relative).cent)
+                  .toList() +
+              [0]),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -24,15 +28,26 @@ class Question extends StatelessWidget {
             const AnswerResultGap(),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
               QuestionNote(
-                  relative: _relatives[0], do4Frequency: _do4Frequency),
+                relative: _relatives[0],
+                do4Frequency: _do4Frequency,
+                noteIndex: 0,
+              ),
               QuestionNote(
-                  relative: _relatives[1], do4Frequency: _do4Frequency),
+                relative: _relatives[1],
+                do4Frequency: _do4Frequency,
+                noteIndex: 1,
+              ),
               QuestionNote(
-                  relative: _relatives[2], do4Frequency: _do4Frequency),
+                relative: _relatives[2],
+                do4Frequency: _do4Frequency,
+                noteIndex: 2,
+              ),
               QuestionNote(
-                  relative: Relative.Do4,
-                  do4Frequency: _do4Frequency,
-                  isScrollable: false),
+                relative: Relative.Do4,
+                do4Frequency: _do4Frequency,
+                isScrollable: false,
+                noteIndex: 3,
+              ),
             ]),
             const OkNextButton(),
           ],
@@ -89,8 +104,30 @@ class OkNextButton extends StatelessWidget {
 }
 
 class AnswerNotifier extends ChangeNotifier {
+  AnswerNotifier({@required List<int> correctCents})
+      : _correctCents = correctCents;
   bool _didAnswer = true;
   bool get didAnswer => _didAnswer;
+  final List<int> _correctCents;
+  final List<int> _answerCents = List.filled(3 + 1, 0);
+
+  void setAnswerCent(int index, int answerCent) {
+    _answerCents[index] = answerCent;
+  }
+
+  String oneDifferenceText(int index) {
+    final _diff = _answerCents[index] - _correctCents[index];
+    final _prefix = _diff >= 0 ? '+' : '';
+    return '$_prefix${_diff.toString()}';
+  }
+
+  int get totalDifference {
+    var _temp = 0;
+    for (var i = 0; i < 3; i++) {
+      _temp = _temp + (_answerCents[i] - _correctCents[i]).abs();
+    }
+    return _temp;
+  }
 
   void answer() {
     _didAnswer = true;
