@@ -67,7 +67,8 @@ class AnswerResultGap extends StatelessWidget {
     return SizedBox(
       height: 40,
       child: Provider.of<AnswerNotifier>(context).didAnswer
-          ? Text('492',
+          ? Text(
+              Provider.of<AnswerNotifier>(context).totalDifference.toString(),
               style:
                   TextStyle(fontSize: 30, color: Theme.of(context).errorColor))
           : const Text('', style: TextStyle(fontSize: 30)),

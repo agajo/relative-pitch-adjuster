@@ -27,10 +27,13 @@ class NoteContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO(madao): I want to just detect "touch". but I can't. still problem.
     return GestureDetector(
-      onPanStart: (_) => Provider.of<JsCaller>(context, listen: false).play(
-          _cent == null
+      onPanStart: (_) {
+        if (_isActive) {
+          Provider.of<JsCaller>(context, listen: false).play(_cent == null
               ? note.frequency(do4Frequency: _do4Frequency)
-              : _do4Frequency * pow(2, _cent / 1200)),
+              : _do4Frequency * pow(2, _cent / 1200));
+        }
+      },
       onPanEnd: (_) => Provider.of<JsCaller>(context, listen: false).stop(),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
