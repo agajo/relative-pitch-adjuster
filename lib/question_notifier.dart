@@ -3,11 +3,18 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:relative_pitch_adjuster/solfege_constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class QuestionNotifier extends ChangeNotifier {
   QuestionNotifier() {
     setInitial();
     Timer(const Duration(seconds: 1), goToNext);
+    SharedPreferences.getInstance().then((prefs) {
+      for (final relative in Relative.values) {
+        _lastDifferences[relative.toString()] =
+            prefs.getString(relative.toString());
+      }
+    });
   }
   bool _didAnswer = false;
   bool get didAnswer => _didAnswer;
@@ -29,6 +36,8 @@ class QuestionNotifier extends ChangeNotifier {
   List<int> get fixedAnswerCents => _fixedAnswerCents;
   bool _canMakeSound = true;
   bool get canMakeSound => _canMakeSound;
+  final Map<String, String> _lastDifferences = {};
+  Map<String, String> get lastDifferences => _lastDifferences;
 
   void setAnswerCent(int index, int answerCent) {
     _answerCents[index] = answerCent;
@@ -52,6 +61,14 @@ class QuestionNotifier extends ChangeNotifier {
   void answer() {
     _didAnswer = true;
     _fixedAnswerCents = _answerCents.toList();
+    SharedPreferences.getInstance().then((prefs) {
+      for (var i = 0; i < 3; i++) {
+        _lastDifferences[Relative.values[_relativeIndexes[i]].toString()] =
+            oneDifferenceText(i);
+        prefs.setString(Relative.values[_relativeIndexes[i]].toString(),
+            oneDifferenceText(i));
+      }
+    });
     notifyListeners();
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:relative_pitch_adjuster/last_differences.dart';
 import 'package:relative_pitch_adjuster/question.dart';
 import 'package:relative_pitch_adjuster/question_notifier.dart';
 
@@ -16,7 +17,14 @@ class GameView extends StatelessWidget {
       create: (context) => JsCaller(),
       child: ChangeNotifierProvider<QuestionNotifier>(
         create: (_) => QuestionNotifier(),
-        child: const Question(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Question(),
+            const SizedBox(height: 10),
+            LastDifferences(),
+          ],
+        ),
       ),
     );
   }
