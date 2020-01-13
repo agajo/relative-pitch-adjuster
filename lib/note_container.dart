@@ -9,26 +9,29 @@ import 'js_caller.dart';
 class NoteContainer extends StatelessWidget {
   NoteContainer({
     @required Relative relative,
-    @required double do4Frequency,
+    double do4Frequency,
     int cent,
     bool isActive,
     bool showsCent,
+    bool doPlaySound,
   })  : note = Note.fromRelative(relative),
         _do4Frequency = do4Frequency,
         _cent = cent ?? Note.fromRelative(relative).cent,
         _isActive = isActive ?? true,
-        _showsCent = showsCent ?? true;
+        _showsCent = showsCent ?? true,
+        _doPlaySound = doPlaySound ?? true;
   final Note note;
   final double _do4Frequency;
   final int _cent;
   final bool _isActive;
   final bool _showsCent;
+  final bool _doPlaySound;
   @override
   Widget build(BuildContext context) {
     // TODO(madao): I want to just detect "touch". but I can't. still problem.
     return GestureDetector(
       onPanStart: (_) {
-        if (_isActive) {
+        if (_isActive && _doPlaySound) {
           Provider.of<JsCaller>(context, listen: false).play(_cent == null
               ? note.frequency(do4Frequency: _do4Frequency)
               : _do4Frequency * pow(2, _cent / 1200));
