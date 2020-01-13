@@ -60,9 +60,15 @@ class QuestionNotifier extends ChangeNotifier {
             .map((index) => Note.fromRelative(Relative.values[index]).cent)
             .toList() +
         [Note.fromRelative(Relative.Do4).cent];
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 3 + 1; i++) {
+      var _rand = Random().nextInt(200) - 100;
+      if (_rand < 0) {
+        _rand = _rand - 50;
+      } else {
+        _rand = _rand + 50;
+      }
       _answerWheelControllers[i].animateToItem(
-          _correctCents[i] + (3501 - 1) ~/ 2,
+          _correctCents[i] + (3501 - 1) ~/ 2 + (i == 3 ? 0 : _rand),
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut);
     }
