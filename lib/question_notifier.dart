@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -5,7 +6,8 @@ import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
 class QuestionNotifier extends ChangeNotifier {
   QuestionNotifier() {
-    goToNext();
+    setInitial();
+    Timer(const Duration(seconds: 1), goToNext);
   }
   bool _didAnswer = false;
   bool get didAnswer => _didAnswer;
@@ -80,6 +82,14 @@ class QuestionNotifier extends ChangeNotifier {
       _canMakeSound = true;
       notifyListeners();
     });
+    notifyListeners();
+  }
+
+  void setInitial() {
+    _didAnswer = false;
+    _do4Frequency = 440;
+    _relativeIndexes = List.filled(3 + 1, Relative.Do4.index);
+    _correctCents = List.filled(3 + 1, 440);
     notifyListeners();
   }
 
