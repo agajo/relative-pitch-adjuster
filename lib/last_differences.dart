@@ -8,7 +8,6 @@ class LastDifferences extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _diffs = Relative.values.map((_relative) {
-      var _note = Note.fromRelative(_relative);
       return SizedBox(
         width: 150,
         child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -31,6 +30,7 @@ class LastDifferences extends StatelessWidget {
       SizedBox(
         height: 210,
         child: SingleChildScrollView(
+          controller: ScrollController(initialScrollOffset: 270),
           child: Column(
             children: _diffs.toList().reversed.toList(),
           ),
