@@ -24,7 +24,7 @@ class JsCaller {
       _isPlaying = true;
     }
     _timer?.cancel();
-    _timer = Timer(const Duration(seconds: 3), () {
+    _timer = Timer(const Duration(seconds: 2), () {
       js.context.callMethod('stop');
       _isPlaying = false;
     });

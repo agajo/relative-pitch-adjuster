@@ -25,6 +25,8 @@ class QuestionNotifier extends ChangeNotifier {
       _answerWheelControllers;
   List<int> _fixedAnswerCents = List.filled(3 + 1, 0);
   List<int> get fixedAnswerCents => _fixedAnswerCents;
+  bool _canMakeSound = true;
+  bool get canMakeSound => _canMakeSound;
 
   void setAnswerCent(int index, int answerCent) {
     _answerCents[index] = answerCent;
@@ -60,6 +62,8 @@ class QuestionNotifier extends ChangeNotifier {
             .map((index) => Note.fromRelative(Relative.values[index]).cent)
             .toList() +
         [Note.fromRelative(Relative.Do4).cent];
+    _canMakeSound = false;
+    final _futures = <Future>[];
     for (var i = 0; i < 3 + 1; i++) {
       var _rand = Random().nextInt(200) - 100;
       if (_rand < 0) {
@@ -67,11 +71,15 @@ class QuestionNotifier extends ChangeNotifier {
       } else {
         _rand = _rand + 50;
       }
-      _answerWheelControllers[i].animateToItem(
+      _futures.add(_answerWheelControllers[i].animateToItem(
           _correctCents[i] + (3501 - 1) ~/ 2 + (i == 3 ? 0 : _rand),
           duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut);
+          curve: Curves.easeInOut));
     }
+    Future.wait<dynamic>(_futures).then((_) {
+      _canMakeSound = true;
+      notifyListeners();
+    });
     notifyListeners();
   }
 

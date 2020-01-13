@@ -77,10 +77,13 @@ class Answerer extends StatelessWidget {
                 onSelectedItemChanged: (i) {
                   _answerCent = i - (_wheelListItemNumber - 1) ~/ 2;
                   _frequency = _do4Frequency * pow(2, _answerCent / 1200);
-                  Provider.of<JsCaller>(context, listen: false)
-                      .playLong(_frequency);
                   Provider.of<QuestionNotifier>(context, listen: false)
                       .setAnswerCent(_noteIndex, _answerCent);
+                  if (Provider.of<QuestionNotifier>(context, listen: false)
+                      .canMakeSound) {
+                    Provider.of<JsCaller>(context, listen: false)
+                        .playLong(_frequency);
+                  }
                 },
               ),
             ),
