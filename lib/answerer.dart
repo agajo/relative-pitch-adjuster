@@ -8,7 +8,7 @@ import 'package:relative_pitch_adjuster/solfege_constants.dart';
 
 import 'js_caller.dart';
 
-class Answerer extends StatefulWidget {
+class Answerer extends StatelessWidget {
   const Answerer({
     Key key,
     @required int noteIndex,
@@ -26,37 +26,22 @@ class Answerer extends StatefulWidget {
   final double _do4Frequency;
   final bool _isScrollable;
 
-  @override
-  _AnswererState createState() => _AnswererState();
-}
-
-class _AnswererState extends State<Answerer> {
+  // ignore: avoid_field_initializers_in_const_classes
   final int _wheelListItemNumber = 3501;
-  int _answerCent;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    setState(() {
-      _answerCent = Provider.of<QuestionNotifier>(context, listen: false)
-          .correctCents[widget._noteIndex];
-      _wheelController = FixedExtentScrollController(
-          initialItem: _answerCent + (_wheelListItemNumber - 1) ~/ 2);
-      _wheelController
-          .jumpToItem(_answerCent + (_wheelListItemNumber - 1) ~/ 2);
-    });
-  }
-
-  FixedExtentScrollController _wheelController;
-  double _frequency;
   @override
   Widget build(BuildContext context) {
-    _frequency = widget._do4Frequency * pow(2, _answerCent / 1200);
+    var _answerCent =
+        Provider.of<QuestionNotifier>(context).answerCents[_noteIndex];
+    final _wheelController =
+        Provider.of<QuestionNotifier>(context, listen: false)
+            .answerWheelControllers[_noteIndex];
+    var _frequency = _do4Frequency * pow(2, _answerCent / 1200);
     return Column(
       children: <Widget>[
         NoteContainer(
-          relative: widget._relative,
-          do4Frequency: widget._do4Frequency,
+          relative: _relative,
+          do4Frequency: _do4Frequency,
           showsCent: Provider.of<QuestionNotifier>(context).didAnswer &&
               Provider.of<QuestionNotifier>(context).doShowCentInAnswer,
           cent: _answerCent,
@@ -75,35 +60,27 @@ class _AnswererState extends State<Answerer> {
               height: 100,
               width: 60,
               child: ListWheelScrollView(
-                // TODO(madao): これだめ！スクロールするたびに、ホイールが新しいエレメントで置き換えられて、スムーズにスクロールしない。
-                // 次の問題に行った時にだけ、ホイールの位置を変更する処理をかける。
-                // key: UniqueKey(),
                 controller: _wheelController,
                 itemExtent: 15,
-                physics: widget._isScrollable
+                physics: _isScrollable
                     ? const AlwaysScrollableScrollPhysics()
                     : const NeverScrollableScrollPhysics(),
                 children: List.generate(
                   3501,
                   (_) => Center(
                       child: Container(
-                          color: widget._isScrollable
-                              ? Note.fromRelative(widget._relative)
-                                  .solfege
-                                  .color
+                          color: _isScrollable
+                              ? Note.fromRelative(_relative).solfege.color
                               : Colors.grey,
                           height: 7)),
                 ),
                 onSelectedItemChanged: (i) {
-                  setState(() {
-                    _answerCent = i - (_wheelListItemNumber - 1) ~/ 2;
-                    _frequency =
-                        widget._do4Frequency * pow(2, _answerCent / 1200);
-                    Provider.of<JsCaller>(context, listen: false)
-                        .playLong(_frequency);
-                    Provider.of<QuestionNotifier>(context, listen: false)
-                        .setAnswerCent(widget._noteIndex, _answerCent);
-                  });
+                  _answerCent = i - (_wheelListItemNumber - 1) ~/ 2;
+                  _frequency = _do4Frequency * pow(2, _answerCent / 1200);
+                  Provider.of<JsCaller>(context, listen: false)
+                      .playLong(_frequency);
+                  Provider.of<QuestionNotifier>(context, listen: false)
+                      .setAnswerCent(_noteIndex, _answerCent);
                 },
               ),
             ),

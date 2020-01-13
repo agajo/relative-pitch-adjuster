@@ -12,19 +12,27 @@ class QuestionNotifier extends ChangeNotifier {
   bool _doShowCentInAnswer = true;
   bool get doShowCentInAnswer => _doShowCentInAnswer;
   final List<int> _answerCents = List.filled(3 + 1, 0);
+  List<int> get answerCents => _answerCents;
   double _do4Frequency;
   double get do4Frequency => _do4Frequency;
   List<int> _relativeIndexes;
   List<int> _correctCents;
   List<int> get correctCents => _correctCents;
   List<int> get relativeIndexes => _relativeIndexes;
+  final List<FixedExtentScrollController> _answerWheelControllers =
+      List<void>(3 + 1).map((_) => FixedExtentScrollController()).toList();
+  List<FixedExtentScrollController> get answerWheelControllers =>
+      _answerWheelControllers;
+  List<int> _fixedAnswerCents = List.filled(3 + 1, 0);
+  List<int> get fixedAnswerCents => _fixedAnswerCents;
 
   void setAnswerCent(int index, int answerCent) {
     _answerCents[index] = answerCent;
+    notifyListeners();
   }
 
   String oneDifferenceText(int index) {
-    final _diff = _answerCents[index] - _correctCents[index];
+    final _diff = _fixedAnswerCents[index] - _correctCents[index];
     final _prefix = _diff >= 0 ? '+' : '';
     return '$_prefix${_diff.toString()}';
   }
@@ -32,13 +40,14 @@ class QuestionNotifier extends ChangeNotifier {
   int get totalDifference {
     var _temp = 0;
     for (var i = 0; i < 3; i++) {
-      _temp = _temp + (_answerCents[i] - _correctCents[i]).abs();
+      _temp = _temp + (_fixedAnswerCents[i] - _correctCents[i]).abs();
     }
     return _temp;
   }
 
   void answer() {
     _didAnswer = true;
+    _fixedAnswerCents = _answerCents.toList();
     notifyListeners();
   }
 
@@ -51,6 +60,12 @@ class QuestionNotifier extends ChangeNotifier {
             .map((index) => Note.fromRelative(Relative.values[index]).cent)
             .toList() +
         [Note.fromRelative(Relative.Do4).cent];
+    for (var i = 0; i < 3; i++) {
+      _answerWheelControllers[i].animateToItem(
+          _correctCents[i] + (3501 - 1) ~/ 2,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut);
+    }
     notifyListeners();
   }
 
