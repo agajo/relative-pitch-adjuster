@@ -144,6 +144,12 @@ List<int> _generateRelativeIndexes() {
         break;
       }
     }
+    final _maxDiff =
+        _temp.map((n) => (n - Relative.Do4.index).abs()).reduce(max);
+    final _random = Random().nextInt(7);
+    if (_maxDiff <= _random) {
+      _isOK = false;
+    }
   } while (_isOK == false);
   return _temp;
 }
