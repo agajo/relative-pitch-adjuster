@@ -18,7 +18,8 @@ class Question extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const AnswerResultGap(),
+          // TODO(madao): いらなそうだったら、定義部分ごと消せ
+          // const AnswerResultGap(),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
             QuestionNote(
               relative: _relatives[0],

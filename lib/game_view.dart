@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:relative_pitch_adjuster/difficulty_selector.dart';
 import 'package:relative_pitch_adjuster/last_differences.dart';
 import 'package:relative_pitch_adjuster/question.dart';
 import 'package:relative_pitch_adjuster/question_notifier.dart';
@@ -22,7 +23,13 @@ class GameView extends StatelessWidget {
           children: <Widget>[
             const Question(),
             const SizedBox(height: 10),
-            LastDifferences(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                LastDifferences(),
+                DifficultySelector(),
+              ],
+            ),
           ],
         ),
       ),

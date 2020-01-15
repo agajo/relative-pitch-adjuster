@@ -38,6 +38,28 @@ class QuestionNotifier extends ChangeNotifier {
   bool get canMakeSound => _canMakeSound;
   final Map<String, String> _lastDifferences = {};
   Map<String, String> get lastDifferences => _lastDifferences;
+  Difficulty _difficulty = Difficulty.easy;
+  int _threshold = 50;
+  int get threshold => _threshold;
+
+  void setDifficulty(int index) {
+    _difficulty = Difficulty.values[index];
+    switch (_difficulty) {
+      case Difficulty.easy:
+        _threshold = 50;
+        break;
+      case Difficulty.normal:
+        _threshold = 30;
+        break;
+      case Difficulty.hard:
+        _threshold = 10;
+        break;
+      case Difficulty.veryHard:
+        _threshold = 5;
+        break;
+    }
+    notifyListeners();
+  }
 
   void setAnswerCent(int index, int answerCent) {
     _answerCents[index] = answerCent;
@@ -48,6 +70,10 @@ class QuestionNotifier extends ChangeNotifier {
     final _diff = _fixedAnswerCents[index] - _correctCents[index];
     final _prefix = _diff >= 0 ? '+' : '';
     return '$_prefix${_diff.toString()}';
+  }
+
+  int oneDifference(int index) {
+    return _fixedAnswerCents[index] - _correctCents[index];
   }
 
   int get totalDifference {
@@ -152,4 +178,11 @@ List<int> _generateRelativeIndexes() {
     }
   } while (_isOK == false);
   return _temp;
+}
+
+enum Difficulty {
+  easy,
+  normal,
+  hard,
+  veryHard,
 }

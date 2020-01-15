@@ -30,7 +30,14 @@ class QuestionNote extends StatelessWidget {
                   Provider.of<QuestionNotifier>(context)
                           .oneDifferenceText(_noteIndex) ??
                       '',
-                  style: TextStyle(fontSize: 20, color: Colors.white70))
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Provider.of<QuestionNotifier>(context)
+                                  .oneDifference(_noteIndex)
+                                  .abs() >
+                              Provider.of<QuestionNotifier>(context).threshold
+                          ? Colors.red
+                          : Colors.green))
               : const Text('', style: TextStyle(fontSize: 20)),
         ),
         NoteContainer(
