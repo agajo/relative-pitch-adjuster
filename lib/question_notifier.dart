@@ -95,6 +95,8 @@ class QuestionNotifier extends ChangeNotifier {
             oneDifferenceText(i));
       }
     });
+    // TODO(madao): ファーストトライかやり直しか、クリアしたのかしてないのかによって処理を分ける。
+    // OKNextボタンの表示内容も変える。
     notifyListeners();
   }
 
