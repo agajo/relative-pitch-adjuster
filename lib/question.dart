@@ -98,7 +98,9 @@ class OkNextButton extends StatelessWidget {
         }
       },
       child: Provider.of<QuestionNotifier>(context).didAnswer
-          ? const Text('Next')
+          ? Provider.of<QuestionNotifier>(context).isCleared
+              ? const Text('Next')
+              : const Text('Retry')
           : const Text('OK!'),
     );
   }

@@ -12,6 +12,7 @@ class DifficultySelector extends StatelessWidget {
         physics: const FixedExtentScrollPhysics(),
         itemExtent: 20,
         children: const <Widget>[
+          Text('no check'),
           Text('easy'),
           Text('normal'),
           Text('hard'),

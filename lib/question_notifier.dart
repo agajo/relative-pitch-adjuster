@@ -18,6 +18,10 @@ class QuestionNotifier extends ChangeNotifier {
   }
   bool _didAnswer = false;
   bool get didAnswer => _didAnswer;
+  bool _isFirstTry = true;
+  bool get isFirstTry => _isFirstTry;
+  bool _isCleared = true;
+  bool get isCleared => _isCleared;
   bool _doShowCentInAnswer = true;
   bool get doShowCentInAnswer => _doShowCentInAnswer;
   final List<int> _answerCents = List.filled(3 + 1, 0);
@@ -39,12 +43,26 @@ class QuestionNotifier extends ChangeNotifier {
   final Map<String, String> _lastDifferences = {};
   Map<String, String> get lastDifferences => _lastDifferences;
   Difficulty _difficulty = Difficulty.easy;
-  int _threshold = 50;
+  int _threshold = 10000;
   int get threshold => _threshold;
+
+  void _updateIfCleared() {
+    if (List.generate(_fixedAnswerCents.length, (i) => i)
+            .map((i) => oneDifference(i).abs())
+            .reduce(max) <
+        _threshold) {
+      _isCleared = true;
+    } else {
+      _isCleared = false;
+    }
+  }
 
   void setDifficulty(int index) {
     _difficulty = Difficulty.values[index];
     switch (_difficulty) {
+      case Difficulty.noCheck:
+        _threshold = 10000;
+        break;
       case Difficulty.easy:
         _threshold = 50;
         break;
@@ -58,6 +76,7 @@ class QuestionNotifier extends ChangeNotifier {
         _threshold = 5;
         break;
     }
+    _updateIfCleared();
     notifyListeners();
   }
 
@@ -87,24 +106,36 @@ class QuestionNotifier extends ChangeNotifier {
   void answer() {
     _didAnswer = true;
     _fixedAnswerCents = _answerCents.toList();
-    SharedPreferences.getInstance().then((prefs) {
-      for (var i = 0; i < 3; i++) {
-        _lastDifferences[Relative.values[_relativeIndexes[i]].toString()] =
-            oneDifferenceText(i);
-        prefs.setString(Relative.values[_relativeIndexes[i]].toString(),
-            oneDifferenceText(i));
-      }
-    });
-    // TODO(madao): ファーストトライかやり直しか、クリアしたのかしてないのかによって処理を分ける。
-    // OKNextボタンの表示内容も変える。
+
+    _updateIfCleared();
+
     notifyListeners();
   }
 
   void goToNext() {
+    if (_isFirstTry && _didAnswer == true) {
+      SharedPreferences.getInstance().then((prefs) {
+        for (var i = 0; i < 3; i++) {
+          _lastDifferences[Relative.values[_relativeIndexes[i]].toString()] =
+              oneDifferenceText(i);
+          prefs.setString(Relative.values[_relativeIndexes[i]].toString(),
+              oneDifferenceText(i));
+        }
+      });
+    }
+
     _didAnswer = false;
     _do4Frequency =
         440 * pow(2, (Random().nextDouble() * 11 - 9) / 12).toDouble();
-    _relativeIndexes = _generateRelativeIndexes() + [Relative.Do4.index];
+
+    if (_isCleared) {
+      _relativeIndexes = _generateRelativeIndexes() + [Relative.Do4.index];
+      _isFirstTry = true;
+    } else {
+      _isFirstTry = false;
+    }
+
+    _isCleared = false;
     _correctCents = _relativeIndexes
             .map((index) => Note.fromRelative(Relative.values[index]).cent)
             .toList() +
@@ -183,6 +214,7 @@ List<int> _generateRelativeIndexes() {
 }
 
 enum Difficulty {
+  noCheck,
   easy,
   normal,
   hard,
