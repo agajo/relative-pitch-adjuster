@@ -182,9 +182,8 @@ List<int> _generateRelativeIndexes() {
   List<int> _temp;
   do {
     _isOK = true;
-    _temp =
-        List.generate(3, (_) => Random().nextInt(Relative.values.length - 1))
-            .toList();
+    _temp = List.generate(3, (_) => Random().nextInt(Relative.values.length))
+        .toList();
     if (_temp.last == Relative.Do4.index ||
         (_temp.last - Relative.Do4.index).abs() > 4) {
       _isOK = false;
