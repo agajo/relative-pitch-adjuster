@@ -114,14 +114,16 @@ class QuestionNotifier extends ChangeNotifier {
 
   void goToNext() {
     if (_isFirstTry && _didAnswer == true) {
-      SharedPreferences.getInstance().then((prefs) {
-        for (var i = 0; i < 3; i++) {
-          _lastDifferences[Relative.values[_relativeIndexes[i]].toString()] =
-              oneDifferenceText(i);
-          prefs.setString(Relative.values[_relativeIndexes[i]].toString(),
-              oneDifferenceText(i));
-        }
-      });
+      for (var i = 0; i < 3; i++) {
+        _lastDifferences[Relative.values[_relativeIndexes[i]].toString()] =
+            oneDifferenceText(i);
+        SharedPreferences.getInstance().then((prefs) {
+          prefs.setString(
+              Relative.values[_relativeIndexes[i]].toString(),
+              _lastDifferences[
+                  Relative.values[_relativeIndexes[i]].toString()]);
+        });
+      }
     }
 
     _didAnswer = false;
