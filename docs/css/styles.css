@@ -27,13 +27,15 @@ main {
 
 .note-card {
   width: 5rem;           /* w-20 */
-  border-radius: 0.5rem; /* rounded-lg */
+  border-radius: 1rem;   /* rounded-2xl */
   overflow: hidden;
   display: flex;
   flex-direction: column;
   background-color: #374151; /* bg-gray-700 */
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+  cursor: pointer;
+  user-select: none;
 }
 
 .note-card:hover {
@@ -41,11 +43,23 @@ main {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
 }
 
+.note-card:active {
+  transform: scale(0.98);
+}
+
+.note-card--inactive {
+  opacity: 0.5;
+}
+
+.note-card--inactive .note-card__header {
+  background-color: #6b7280 !important; /* gray-500 */
+}
+
 .note-card__header {
-  padding: 0.5rem;
+  padding: 0.75rem 0.5rem;
   text-align: center;
   font-weight: bold;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
@@ -81,23 +95,43 @@ main {
 
 .wheel-container {
   width: 4rem;
-  height: 150px;
+  height: 120px;
   position: relative;
   overflow: hidden;
   background: linear-gradient(
     to bottom,
-    rgba(17, 24, 39, 0.9) 0%,
-    rgba(17, 24, 39, 0.3) 30%,
-    transparent 50%,
-    rgba(17, 24, 39, 0.3) 70%,
-    rgba(17, 24, 39, 0.9) 100%
+    rgba(17, 24, 39, 0.95) 0%,
+    rgba(17, 24, 39, 0.5) 25%,
+    transparent 45%,
+    transparent 55%,
+    rgba(17, 24, 39, 0.5) 75%,
+    rgba(17, 24, 39, 0.95) 100%
   );
   border-radius: 0.5rem;
   cursor: ns-resize;
+  touch-action: none;
+}
+
+.wheel-container.wheel-disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.wheel-container.wheel-dragging {
+  cursor: grabbing;
 }
 
 .wheel-track {
   position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
   top: 50%;
   left: 0;
   right: 0;
@@ -107,23 +141,26 @@ main {
 
 .wheel-item {
   height: 15px;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  position: absolute;
+  left: 0;
+  top: 50%;
 }
 
 .wheel-item__bar {
-  width: 80%;
-  height: 3px;
-  border-radius: 1px;
-  opacity: 0.5;
-  transition: opacity 0.1s;
+  width: 75%;
+  height: 4px;
+  border-radius: 2px;
+  opacity: 0.4;
+  transition: opacity 0.1s, height 0.1s;
 }
 
 .wheel-item--selected .wheel-item__bar {
   opacity: 1;
-  height: 4px;
+  height: 6px;
 }
 
 /* 中央インジケーター */
@@ -322,4 +359,75 @@ select {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
+}
+
+/* ===== Phase 3: QuestionNote コンポーネント ===== */
+
+.notes-container {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+.note-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.question-note {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.difference-display {
+  height: 1.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-family: 'SF Mono', Monaco, 'Consolas', monospace;
+}
+
+.answer-note-wrapper {
+  position: relative;
+}
+
+.answer-cent-display {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-family: 'SF Mono', Monaco, 'Consolas', monospace;
+  margin-top: 0.25rem;
+}
+
+.wheel-wrapper {
+  margin-top: 0.5rem;
+}
+
+/* ===== レスポンシブ調整 ===== */
+
+@media (max-width: 480px) {
+  .notes-container {
+    gap: 0.25rem;
+  }
+  
+  .note-card {
+    width: 4rem;
+  }
+  
+  .note-card__header {
+    padding: 0.5rem 0.25rem;
+    font-size: 1rem;
+  }
+  
+  .wheel-container {
+    width: 3.5rem;
+    height: 100px;
+  }
+  
+  .difference-display {
+    font-size: 0.875rem;
+  }
 }

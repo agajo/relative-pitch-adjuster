@@ -6,12 +6,16 @@
 import { getAppState } from './state.js';
 import { Relative, RelativeNames, Note } from './constants.js';
 import { getAudio, centToFrequency } from './audio.js';
+import { NotesContainer } from './note.js';
 
 // グローバルな状態インスタンス
 const appState = getAppState();
 
 // グローバルな Audio インスタンス
 const audio = getAudio();
+
+// 音符コンテナ
+let notesContainer = null;
 
 /**
  * DOM が読み込まれたら初期化
@@ -20,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('Relative Pitch Adjuster - Web Version');
   console.log('Phase 1: 基盤構築完了');
   console.log('Phase 2: 音声機能実装完了');
+  console.log('Phase 3: UIコンポーネント実装完了');
   
   initializeApp();
 });
@@ -28,6 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
  * アプリケーションの初期化
  */
 async function initializeApp() {
+  // 音符コンテナの初期化
+  const notesEl = document.getElementById('notes-container');
+  if (notesEl) {
+    notesContainer = new NotesContainer(notesEl);
+  }
+
   // UI イベントの設定
   setupEventListeners();
   
@@ -42,6 +53,33 @@ async function initializeApp() {
   
   // Audio の初期化（ユーザーインタラクション後に実行される）
   console.log('Audio will be initialized on first user interaction');
+
+  // 1秒後に最初の問題を生成
+  setTimeout(async () => {
+    await startFirstQuestion();
+  }, 1000);
+}
+
+/**
+ * 最初の問題を開始
+ */
+async function startFirstQuestion() {
+  // Audio が初期化されていなければ初期化を試みる
+  if (!audio.isInitialized) {
+    await audio.initialize();
+  }
+
+  // 次の問題へ（animateCallback付き）
+  await appState.goToNext(async (targetIndices) => {
+    if (notesContainer) {
+      await notesContainer.animateWheels(targetIndices);
+    }
+  });
+
+  // 問題の更新
+  if (notesContainer) {
+    notesContainer.updateQuestion();
+  }
 }
 
 /**
@@ -103,8 +141,17 @@ async function handleOkNextClick() {
   }
 
   if (appState.didAnswer) {
-    // 次の問題へ
-    await appState.goToNext();
+    // 次の問題へ（animateCallback付き）
+    await appState.goToNext(async (targetIndices) => {
+      if (notesContainer) {
+        await notesContainer.animateWheels(targetIndices);
+      }
+    });
+    
+    // 問題の更新
+    if (notesContainer) {
+      notesContainer.updateQuestion();
+    }
   } else {
     // 回答を確定
     appState.answer();
@@ -154,6 +201,11 @@ export function stopNote() {
  */
 function handleStateChange(state) {
   updateUI();
+  
+  // 音符コンテナも更新
+  if (notesContainer) {
+    notesContainer.update();
+  }
 }
 
 /**

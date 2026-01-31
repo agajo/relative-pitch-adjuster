@@ -163,12 +163,12 @@ ListWheelScrollView(
 | 2-1 | Tone.js 統合 | CDN 読み込み、初期化 | ✅ |
 | 2-2 | Audio モジュール (`audio.js`) | play, stop, setNote, playLong | ✅ |
 
-### Phase 3: UI コンポーネント（優先度: 高）
-| # | タスク | 詳細 | 見積 |
+### Phase 3: UI コンポーネント（優先度: 高）✅ 完了 (2026-01-31)
+| # | タスク | 詳細 | 状態 |
 |---|--------|------|------|
-| 3-1 | NoteContainer (`note.js`) | 音符表示カード | 45分 |
-| 3-2 | **Wheel Selector (`wheel.js`)** | ★メインの難所 | 2-3時間 |
-| 3-3 | QuestionNote 統合 | 差分表示 + NoteContainer + Wheel | 30分 |
+| 3-1 | NoteContainer (`note.js`) | 音符表示カード | ✅ |
+| 3-2 | **Wheel Selector (`wheel.js`)** | ★メインの難所 | ✅ |
+| 3-3 | QuestionNote 統合 | 差分表示 + NoteContainer + Wheel | ✅ |
 
 ### Phase 4: ゲームロジック（優先度: 高）
 | # | タスク | 詳細 | 見積 |
@@ -278,9 +278,22 @@ Si  → purple-500
 - [x] `js/main.js` に Audio 統合
 - [x] テスト用音声再生ボタン追加
 
-### Phase 3〜6: 未実装
-- [ ] `js/wheel.js` 実装 ★
-- [ ] `js/note.js` 実装
+### Phase 3: UI コンポーネント ✅ 完了 (2026-01-31)
+- [x] `js/wheel.js` 実装 ★
+  - ドラッグ/タッチによるスクロール
+  - マウスホイール対応
+  - 慣性スクロール
+  - animateTo() によるアニメーション
+- [x] `js/note.js` 実装
+  - QuestionNoteComponent クラス
+  - NotesContainer クラス
+  - 差分表示、正解/回答音符カード
+- [x] `js/main.js` 統合
+  - NotesContainer の初期化
+  - Wheel アニメーション連携
+- [x] UI/CSS の調整
+
+### Phase 4〜6: 未実装
 - [ ] `js/question.js` 実装
 - [ ] `js/storage.js` 実装
 - [ ] 動作テスト
