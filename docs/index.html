@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relative Pitch Adjuster</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            // ソルフェージュカラー
+            'solfege-do': '#ef4444',    // red-500
+            'solfege-re': '#f97316',    // orange-500
+            'solfege-mi': '#eab308',    // yellow-500
+            'solfege-fa': '#22c55e',    // green-500
+            'solfege-sol': '#3b82f6',   // blue-500
+            'solfege-la': '#6366f1',    // indigo-500
+            'solfege-si': '#a855f7',    // purple-500
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Tone.js CDN (Phase 2 で使用) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  
+  <!-- カスタムスタイル -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="dark bg-gray-900 text-white min-h-screen">
+  
+  <!-- ヘッダー -->
+  <header class="bg-gray-800 shadow-lg">
+    <div class="container mx-auto px-4 py-3">
+      <h1 class="text-xl font-bold text-cyan-400">Relative Pitch Adjuster</h1>
+    </div>
+  </header>
+  
+  <!-- メインコンテンツ -->
+  <main class="container mx-auto px-4 py-6">
+    
+    <!-- ゲームエリア -->
+    <div id="game-area" class="flex flex-col items-center justify-center min-h-[60vh]">
+      
+      <!-- 音符表示エリア (Phase 3 で実装) -->
+      <div id="notes-container" class="flex gap-4 mb-6">
+        <!-- 4つの音符が並ぶ -->
+        <div class="note-placeholder w-20 h-32 bg-gray-700 rounded-lg flex items-center justify-center text-gray-500">
+          Note 1
+        </div>
+        <div class="note-placeholder w-20 h-32 bg-gray-700 rounded-lg flex items-center justify-center text-gray-500">
+          Note 2
+        </div>
+        <div class="note-placeholder w-20 h-32 bg-gray-700 rounded-lg flex items-center justify-center text-gray-500">
+          Note 3
+        </div>
+        <div class="note-placeholder w-20 h-32 bg-gray-700 rounded-lg flex items-center justify-center text-gray-500">
+          Do4
+        </div>
+      </div>
+      
+      <!-- ボタンエリア -->
+      <div class="flex gap-4 mt-6">
+        <button id="btn-hide-cent" 
+                class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors">
+          Hide Cent
+        </button>
+        <button id="btn-ok-next" 
+                class="px-6 py-2 bg-cyan-500 hover:bg-cyan-400 text-gray-900 font-bold rounded-lg transition-colors">
+          OK!
+        </button>
+      </div>
+      
+    </div>
+    
+    <!-- 下部パネル (Phase 5 で実装) -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Last Differences -->
+      <div id="last-differences" class="bg-gray-800 rounded-lg p-4">
+        <h2 class="text-lg font-semibold mb-3 text-gray-300">Your Last Gap</h2>
+        <div id="differences-list" class="text-sm text-gray-400">
+          <!-- 履歴が表示される -->
+          <p class="text-gray-500 italic">No history yet</p>
+        </div>
+      </div>
+      
+      <!-- 難易度セレクタ -->
+      <div id="difficulty-selector" class="bg-gray-800 rounded-lg p-4">
+        <h2 class="text-lg font-semibold mb-3 text-gray-300">Difficulty</h2>
+        <select id="difficulty-select" 
+                class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white">
+          <option value="0">No Check</option>
+          <option value="1" selected>Easy (±50 cents)</option>
+          <option value="2">Normal (±30 cents)</option>
+          <option value="3">Hard (±10 cents)</option>
+          <option value="4">Very Hard (±5 cents)</option>
+        </select>
+      </div>
+      
+    </div>
+    
+  </main>
+  
+  <!-- フッター -->
+  <footer class="bg-gray-800 mt-auto py-4">
+    <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+      <p>Relative Pitch Adjuster - Web Version</p>
+    </div>
+  </footer>
+  
+  <!-- JavaScript モジュール -->
+  <script type="module" src="js/main.js"></script>
+  
+</body>
+</html>

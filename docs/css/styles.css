@@ -1,0 +1,325 @@
+/**
+ * styles.css - カスタムスタイル
+ * Tailwind CSS を補完するスタイル定義
+ */
+
+/* ===== 基本設定 ===== */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+main {
+  flex: 1;
+}
+
+/* ===== 音符カード ===== */
+
+.note-card {
+  width: 5rem;           /* w-20 */
+  border-radius: 0.5rem; /* rounded-lg */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: #374151; /* bg-gray-700 */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.note-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+.note-card__header {
+  padding: 0.5rem;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.125rem;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.note-card__cent {
+  padding: 0.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #d1d5db; /* text-gray-300 */
+}
+
+.note-card__difference {
+  padding: 0.25rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.note-card__difference--positive {
+  color: #f87171; /* red-400 */
+}
+
+.note-card__difference--negative {
+  color: #60a5fa; /* blue-400 */
+}
+
+.note-card__difference--zero {
+  color: #34d399; /* green-400 */
+}
+
+/* ===== Wheel Selector ===== */
+
+.wheel-container {
+  width: 4rem;
+  height: 150px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    to bottom,
+    rgba(17, 24, 39, 0.9) 0%,
+    rgba(17, 24, 39, 0.3) 30%,
+    transparent 50%,
+    rgba(17, 24, 39, 0.3) 70%,
+    rgba(17, 24, 39, 0.9) 100%
+  );
+  border-radius: 0.5rem;
+  cursor: ns-resize;
+}
+
+.wheel-track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  transition: transform 0.1s ease-out;
+}
+
+.wheel-item {
+  height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.wheel-item__bar {
+  width: 80%;
+  height: 3px;
+  border-radius: 1px;
+  opacity: 0.5;
+  transition: opacity 0.1s;
+}
+
+.wheel-item--selected .wheel-item__bar {
+  opacity: 1;
+  height: 4px;
+}
+
+/* 中央インジケーター */
+.wheel-indicator {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #06b6d4; /* cyan-500 */
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.wheel-indicator::before,
+.wheel-indicator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.wheel-indicator::before {
+  left: 0;
+  border-width: 5px 8px 5px 0;
+  border-color: transparent #06b6d4 transparent transparent;
+  transform: translateY(-50%);
+}
+
+.wheel-indicator::after {
+  right: 0;
+  border-width: 5px 0 5px 8px;
+  border-color: transparent transparent transparent #06b6d4;
+  transform: translateY(-50%);
+}
+
+/* ===== ボタン ===== */
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn--primary {
+  background-color: #06b6d4; /* cyan-500 */
+  color: #111827; /* gray-900 */
+}
+
+.btn--primary:hover {
+  background-color: #22d3ee; /* cyan-400 */
+}
+
+.btn--secondary {
+  background-color: #4b5563; /* gray-600 */
+  color: white;
+}
+
+.btn--secondary:hover {
+  background-color: #6b7280; /* gray-500 */
+}
+
+.btn--success {
+  background-color: #22c55e; /* green-500 */
+  color: white;
+}
+
+.btn--success:hover {
+  background-color: #4ade80; /* green-400 */
+}
+
+.btn--warning {
+  background-color: #f59e0b; /* amber-500 */
+  color: #111827;
+}
+
+.btn--warning:hover {
+  background-color: #fbbf24; /* amber-400 */
+}
+
+/* ===== Last Differences リスト ===== */
+
+.differences-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.difference-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.difference-item__name {
+  font-weight: 500;
+}
+
+.difference-item__value {
+  font-family: 'SF Mono', Monaco, 'Consolas', monospace;
+}
+
+/* ===== セレクトボックス ===== */
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* ===== アニメーション ===== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ===== レスポンシブ ===== */
+
+@media (max-width: 640px) {
+  .note-card {
+    width: 4rem;
+  }
+  
+  .wheel-container {
+    width: 3.5rem;
+    height: 120px;
+  }
+  
+  .differences-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===== ダークモード調整 ===== */
+
+.dark {
+  color-scheme: dark;
+}
+
+/* スクロールバーのスタイル */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
