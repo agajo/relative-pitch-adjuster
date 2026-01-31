@@ -157,11 +157,11 @@ ListWheelScrollView(
 | 1-3 | 定数定義 (`constants.js`) | Solfege, Relative, Note クラス相当 | ✅ |
 | 1-4 | 状態管理 (`state.js`) | QuestionNotifier 相当の状態管理 | ✅ |
 
-### Phase 2: 音声機能（優先度: 高）
-| # | タスク | 詳細 | 見積 |
+### Phase 2: 音声機能（優先度: 高）✅ 完了 (2026-01-31)
+| # | タスク | 詳細 | 状態 |
 |---|--------|------|------|
-| 2-1 | Tone.js 統合 | CDN 読み込み、初期化 | 15分 |
-| 2-2 | Audio モジュール (`audio.js`) | play, stop, setNote, playLong | 30分 |
+| 2-1 | Tone.js 統合 | CDN 読み込み、初期化 | ✅ |
+| 2-2 | Audio モジュール (`audio.js`) | play, stop, setNote, playLong | ✅ |
 
 ### Phase 3: UI コンポーネント（優先度: 高）
 | # | タスク | 詳細 | 見積 |
@@ -270,8 +270,15 @@ Si  → purple-500
 - [x] `css/styles.css` 実装
 - [x] `js/main.js` 統合
 
-### Phase 2〜6: 未実装
-- [ ] `js/audio.js` 実装
+### Phase 2: 音声機能 ✅ 完了 (2026-01-31)
+- [x] `js/audio.js` 実装
+  - play(), stop(), setNote(), playLong() 
+  - centToFrequency(), frequencyToCent()
+  - ブラウザ AudioContext ポリシー対応
+- [x] `js/main.js` に Audio 統合
+- [x] テスト用音声再生ボタン追加
+
+### Phase 3〜6: 未実装
 - [ ] `js/wheel.js` 実装 ★
 - [ ] `js/note.js` 実装
 - [ ] `js/question.js` 実装

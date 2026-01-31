@@ -5,9 +5,13 @@
 
 import { getAppState } from './state.js';
 import { Relative, RelativeNames, Note } from './constants.js';
+import { getAudio, centToFrequency } from './audio.js';
 
 // グローバルな状態インスタンス
 const appState = getAppState();
+
+// グローバルな Audio インスタンス
+const audio = getAudio();
 
 /**
  * DOM が読み込まれたら初期化
@@ -15,6 +19,7 @@ const appState = getAppState();
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Relative Pitch Adjuster - Web Version');
   console.log('Phase 1: 基盤構築完了');
+  console.log('Phase 2: 音声機能実装完了');
   
   initializeApp();
 });
@@ -22,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /**
  * アプリケーションの初期化
  */
-function initializeApp() {
+async function initializeApp() {
   // UI イベントの設定
   setupEventListeners();
   
@@ -34,6 +39,9 @@ function initializeApp() {
   
   // デバッグ情報の出力
   logDebugInfo();
+  
+  // Audio の初期化（ユーザーインタラクション後に実行される）
+  console.log('Audio will be initialized on first user interaction');
 }
 
 /**
@@ -61,12 +69,39 @@ function setupEventListeners() {
       appState.setDifficulty(parseInt(e.target.value, 10));
     });
   }
+
+  // 音声テスト用ボタン
+  const btnTestAudio = document.getElementById('btn-test-audio');
+  if (btnTestAudio) {
+    btnTestAudio.addEventListener('click', handleTestAudioClick);
+  }
+
+  // 任意の場所クリックで Audio 初期化（ブラウザポリシー対応）
+  document.body.addEventListener('click', initAudioOnFirstInteraction, { once: true });
+  document.body.addEventListener('touchstart', initAudioOnFirstInteraction, { once: true });
+}
+
+/**
+ * 最初のユーザーインタラクションで Audio を初期化
+ */
+async function initAudioOnFirstInteraction() {
+  if (!audio.isInitialized) {
+    const success = await audio.initialize();
+    if (success) {
+      console.log('Audio initialized on user interaction');
+    }
+  }
 }
 
 /**
  * OK/Next ボタンのクリックハンドラ
  */
 async function handleOkNextClick() {
+  // Audio が初期化されていなければ初期化
+  if (!audio.isInitialized) {
+    await audio.initialize();
+  }
+
   if (appState.didAnswer) {
     // 次の問題へ
     await appState.goToNext();
@@ -74,6 +109,43 @@ async function handleOkNextClick() {
     // 回答を確定
     appState.answer();
   }
+}
+
+/**
+ * 音声テストボタンのクリックハンドラ
+ */
+async function handleTestAudioClick() {
+  // Audio が初期化されていなければ初期化
+  if (!audio.isInitialized) {
+    const success = await audio.initialize();
+    if (!success) {
+      console.error('Failed to initialize audio');
+      return;
+    }
+  }
+
+  // Do4 の音を鳴らす
+  const do4Freq = appState.do4Frequency;
+  console.log(`Playing Do4 at ${do4Freq.toFixed(2)} Hz`);
+  audio.playLong(do4Freq);
+}
+
+/**
+ * 指定したセント値の音を再生
+ * @param {number} cent - セント値
+ */
+export function playNoteByCent(cent) {
+  if (!audio.isInitialized) return;
+  
+  const frequency = centToFrequency(cent, appState.do4Frequency);
+  audio.playLong(frequency);
+}
+
+/**
+ * 音を停止
+ */
+export function stopNote() {
+  audio.stop();
 }
 
 /**
@@ -174,7 +246,7 @@ function updateLastDifferences() {
  * デバッグ情報をコンソールに出力
  */
 function logDebugInfo() {
-  console.log('=== Phase 1 Debug Info ===');
+  console.log('=== Debug Info ===');
   console.log('AppState initialized:', appState);
   console.log('Do4 Frequency:', appState.do4Frequency);
   console.log('Threshold:', appState.threshold);
@@ -184,8 +256,15 @@ function logDebugInfo() {
   console.log('- Relative.Do4:', Relative.Do4);
   console.log('- Note.fromRelative(Do4):', Note.fromRelative(Relative.Do4));
   console.log('- Do4 at 440Hz frequency:', Note.fromRelative(Relative.Do4).frequency(440));
-  console.log('========================');
+  console.log('');
+  console.log('Audio モジュール:');
+  console.log('- Audio instance:', audio);
+  console.log('- Is initialized:', audio.isInitialized);
+  console.log('==================');
 }
 
 // グローバルにエクスポート（デバッグ用）
 window.appState = appState;
+window.audio = audio;
+window.playNoteByCent = playNoteByCent;
+window.stopNote = stopNote;
