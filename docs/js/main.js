@@ -345,8 +345,12 @@ function renderHowToPlay(lang) {
   labelEl.textContent = copy.langLabel;
 
   const listItems = copy.items.map((step) => `<li>${step}</li>`).join('');
+  const movableDoParagraphs = (copy.movableDo || [])
+    .map((line) => `<p>${line}</p>`)
+    .join('');
   content.innerHTML = `
     <ul>${listItems}</ul>
+    <div class="mt-3 space-y-2">${movableDoParagraphs}</div>
   `;
 }
 
@@ -359,6 +363,11 @@ const howToPlayCopy = {
       'The reference Do is set independently of concert C and is re-chosen each question.',
       'Of the two rows of note buttons, the top row is the correct answer and the bottom row is your answer.',
       'Using the Do at the far right as the reference, match the pitch of the other three notes.'
+    ],
+    movableDo: [
+      'This app uses movable Do.',
+      'Movable Do treats Do-Re-Mi as scale degrees (roles within a key) rather than fixed pitch names.',
+      'In major keys, the tonic is Do, and when the key changes, the pitch of Do shifts as well (e.g., in G major, G is Do).'
     ]
   },
   ja: {
@@ -369,6 +378,11 @@ const howToPlayCopy = {
       '基準のDoは、いわゆるCの音とは関係なく決まり、問題ごとに設定されます。',
       '2段ある音ボタンのうち、上の段は正解、下の段はあなたの解答です。',
       '右端のDoを基準として、他の3つの音の高さを合わせてください。'
+    ],
+    movableDo: [
+      'このアプリでは「移動ド」を採用しています。',
+      '移動ド（Movable do）は、ドレミを固定の音名ではなく“調の中での役割（階名）”として使う読み方・歌い方です。',
+      '長調では主音が「ド」になり、曲の調が変われば「ド」の高さも移動します（例：ト長調ならGがド）。'
     ]
   },
   'zh-Hans': {
@@ -379,6 +393,11 @@ const howToPlayCopy = {
       '基准 Do 的设定与固定的 C 无关，每一题都会重新设置。',
       '两排音符按钮中，上排是正确答案，下排是你的答案。',
       '以最右侧的 Do 为基准，调整其他三个音的高度。'
+    ],
+    movableDo: [
+      '本应用采用“移动 Do”。',
+      '移动 Do（Movable do）把 Do-Re-Mi 当作调内的功能（音级），而不是固定的音名。',
+      '在大调中，主音是 Do；当调性变化时，Do 的实际音高也会随之移动（例如 G 大调中，G 就是 Do）。'
     ]
   },
   'zh-Hant': {
@@ -389,6 +408,11 @@ const howToPlayCopy = {
       '基準 Do 的設定與固定的 C 無關，每一題都會重新設定。',
       '兩排音符按鈕中，上排是正確答案，下排是你的答案。',
       '以最右側的 Do 為基準，調整其他三個音的高度。'
+    ],
+    movableDo: [
+      '本應用採用「移動 Do」。',
+      '移動 Do（Movable do）把 Do-Re-Mi 視為調內的功能（音級），而不是固定的音名。',
+      '在大調中，主音是 Do；當調性改變時，Do 的實際音高也會跟著移動（例如 G 大調中，G 就是 Do）。'
     ]
   },
   ko: {
@@ -399,6 +423,11 @@ const howToPlayCopy = {
       '기준 Do는 고정된 C와 무관하게 정해지며, 문제마다 새로 설정됩니다.',
       '두 줄의 음표 버튼 중 위쪽은 정답, 아래쪽은 당신의 답입니다.',
       '맨 오른쪽의 Do를 기준으로 다른 세 음의 높이를 맞춰 주세요.'
+    ],
+    movableDo: [
+      '이 앱은 “이동 도”를 사용합니다.',
+      '이동 도(Movable do)는 도레미를 고정된 음이름이 아니라 조 안에서의 역할(계이름)로 읽고 부르는 방식입니다.',
+      '장조에서는 주음이 도가 되며, 조가 바뀌면 도의 높이도 함께 이동합니다(예: G장조에서는 G가 도).'
     ]
   },
   es: {
@@ -409,6 +438,11 @@ const howToPlayCopy = {
       'El Do de referencia se define de forma independiente del C de concierto y se vuelve a elegir en cada pregunta.',
       'De las dos filas de botones de nota, la fila superior es la respuesta correcta y la inferior es tu respuesta.',
       'Usando el Do del extremo derecho como referencia, ajusta la altura de las otras tres notas.'
+    ],
+    movableDo: [
+      'Esta app utiliza el “Do móvil”.',
+      'El Do móvil (Movable do) trata Do-Re-Mi como grados (roles dentro de una tonalidad), no como nombres de notas fijos.',
+      'En tonalidades mayores, la tónica es Do, y cuando cambia la tonalidad, la altura de Do también se mueve (p. ej., en Sol mayor, Sol es Do).'
     ]
   },
   'pt-BR': {
@@ -419,6 +453,11 @@ const howToPlayCopy = {
       'O Do de referência é definido de forma independente do C de concerto e é escolhido novamente a cada questão.',
       'Das duas linhas de botões de nota, a linha de cima é a resposta correta e a de baixo é a sua resposta.',
       'Usando o Do da extrema direita como referência, ajuste a altura das outras três notas.'
+    ],
+    movableDo: [
+      'Este app usa “Do móvel”.',
+      'O Do móvel (Movable do) trata Do-Ré-Mi como graus (funções dentro de uma tonalidade), e não como nomes fixos de notas.',
+      'Em tonalidades maiores, a tônica é Do; quando a tonalidade muda, a altura do Do também se move (ex.: em Sol maior, Sol é Do).'
     ]
   },
   fr: {
@@ -429,6 +468,11 @@ const howToPlayCopy = {
       'Le Do de référence est défini indépendamment du C de concert et est réattribué à chaque question.',
       'Parmi les deux rangées de boutons de notes, la rangée du haut est la bonne réponse et celle du bas est votre réponse.',
       'En prenant le Do tout à droite comme référence, ajustez la hauteur des trois autres notes.'
+    ],
+    movableDo: [
+      'Cette appli utilise le « do mobile ».',
+      'Le do mobile (Movable do) traite Do-Ré-Mi comme des degrés (rôles dans une tonalité) plutôt que comme des noms de notes fixes.',
+      'En tonalité majeure, la tonique est Do, et quand la tonalité change, la hauteur de Do se déplace aussi (ex. : en Sol majeur, Sol est Do).'
     ]
   },
   de: {
@@ -439,6 +483,11 @@ const howToPlayCopy = {
       'Das Referenz-Do wird unabhängig vom Konzert-C festgelegt und pro Aufgabe neu gewählt.',
       'Von den zwei Reihen der Notenbuttons ist die obere Reihe die richtige Antwort und die untere deine Antwort.',
       'Nutze das Do ganz rechts als Referenz und gleiche die Höhe der anderen drei Töne an.'
+    ],
+    movableDo: [
+      'Diese App verwendet das „bewegliche Do“.',
+      'Das bewegliche Do (Movable do) behandelt Do-Re-Mi als Stufen (Funktionen innerhalb einer Tonart) statt als feste Tonhöhen.',
+      'In Durtonarten ist der Grundton Do; wechselt die Tonart, verschiebt sich auch die Höhe von Do (z. B. in G-Dur ist G = Do).'
     ]
   },
   ru: {
@@ -449,6 +498,11 @@ const howToPlayCopy = {
       'Опорная Do выбирается независимо от концертного C и заново задаётся для каждого задания.',
       'Из двух рядов кнопок нот верхний ряд — правильный ответ, нижний — ваш ответ.',
       'Используя Do справа как опору, выровняйте высоту остальных трёх нот.'
+    ],
+    movableDo: [
+      'В этом приложении используется «подвижное до».',
+      'Подвижное до (Movable do) рассматривает Do-Re-Mi как ступени (роли внутри тональности), а не как фиксированные названия нот.',
+      'В мажоре тоника — Do, и при смене тональности высота Do тоже смещается (например, в соль мажоре Do — это G).'
     ]
   }
 };
