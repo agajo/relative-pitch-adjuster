@@ -29,6 +29,41 @@ button,
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ===== Result Banner ===== */
+
+.result-banner-wrapper {
+  background: #111827; /* gray-900 */
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.result-banner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.result-banner--success {
+  color: #0f172a; /* slate-900 */
+  background: linear-gradient(90deg, rgba(34, 197, 94, 0.95), rgba(16, 185, 129, 0.95));
+}
+
+.result-banner--failure {
+  color: #1f2937; /* gray-800 */
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.95), rgba(245, 158, 11, 0.95));
+}
+
+.result-banner.hidden {
+  visibility: hidden;
+}
+
 /* ===== Audio Indicator ===== */
 
 .audio-status {

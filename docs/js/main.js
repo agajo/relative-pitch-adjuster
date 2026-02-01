@@ -205,6 +205,7 @@ async function handleOkNextClick() {
   }
 
   if (appState.didAnswer) {
+    hideResultBanner();
     // 次の問題へ（animateCallback付き）
     await appState.goToNext(async (targetIndices) => {
       if (notesContainer) {
@@ -219,6 +220,7 @@ async function handleOkNextClick() {
   } else {
     // 回答を確定
     appState.answer();
+    showResultBanner(appState.isCleared);
   }
 }
 
@@ -264,6 +266,32 @@ function updateUI() {
   updateHideCentButton();
   updateLastDifferences();
   updateAudioIndicator();
+}
+
+/**
+ * 結果バナーを表示
+ * @param {boolean} isCleared
+ */
+function showResultBanner(isCleared) {
+  const banner = document.getElementById('result-banner');
+  if (!banner) return;
+
+  banner.textContent = isCleared ? 'クリア！' : '残念…';
+  banner.classList.remove('hidden');
+  banner.classList.toggle('result-banner--success', isCleared);
+  banner.classList.toggle('result-banner--failure', !isCleared);
+}
+
+/**
+ * 結果バナーを非表示
+ */
+function hideResultBanner() {
+  const banner = document.getElementById('result-banner');
+  if (!banner) return;
+
+  banner.textContent = '';
+  banner.classList.add('hidden');
+  banner.classList.remove('result-banner--success', 'result-banner--failure');
 }
 
 /**
