@@ -30,6 +30,7 @@ export class QuestionNoteComponent {
     this._audio = getAudio();
     this._note = Note.fromRelative(this.relativeIndex);
     this._wheel = null;
+    this._didWheelChangeSinceDrag = false;
 
     // DOM要素への参照
     this._differenceEl = null;
@@ -228,6 +229,7 @@ export class QuestionNoteComponent {
    */
   _handleWheelChange(cent) {
     this._appState.setAnswerCent(this.noteIndex, cent);
+    this._didWheelChangeSinceDrag = true;
     
     // 音を鳴らす（canMakeSound が true の時のみ）
     if (this._appState.canMakeSound && this._audio.isInitialized) {
@@ -241,7 +243,7 @@ export class QuestionNoteComponent {
    */
   _handleDragStart() {
     if (!this._audio.isInitialized) return;
-    
+    this._didWheelChangeSinceDrag = false;
     const cent = this._appState.answerCents[this.noteIndex];
     const frequency = centToFrequency(cent, this._appState.do4Frequency);
     this._audio.play(frequency);
@@ -251,7 +253,12 @@ export class QuestionNoteComponent {
    * ドラッグ終了時のハンドラ
    */
   _handleDragEnd() {
-    // playLong で自動停止するので何もしない
+    if (!this._audio.isInitialized) return;
+    if (this._didWheelChangeSinceDrag) return;
+
+    const cent = this._appState.answerCents[this.noteIndex];
+    const frequency = centToFrequency(cent, this._appState.do4Frequency);
+    this._audio.playLong(frequency);
   }
 
   /**
