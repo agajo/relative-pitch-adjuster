@@ -23,6 +23,12 @@ main {
   flex: 1;
 }
 
+button,
+.note-card {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* ===== 音符カード ===== */
 
 .note-card {

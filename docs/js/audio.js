@@ -43,6 +43,12 @@ class Audio {
         console.log('AudioContext resumed');
       }
 
+      // 体感レイテンシを下げる（Tone.js の先読みを抑制）
+      // 0.0〜0.01 で調整可。小さすぎると音切れの可能性あり。
+      if (Tone.context) {
+        Tone.context.lookAhead = 0;
+      }
+
       // シンセサイザーを作成
       this._synth = new Tone.Synth({
         oscillator: {

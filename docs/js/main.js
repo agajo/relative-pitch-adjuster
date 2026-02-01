@@ -89,7 +89,7 @@ function setupEventListeners() {
   // Hide Cent ボタン
   const btnHideCent = document.getElementById('btn-hide-cent');
   if (btnHideCent) {
-    btnHideCent.addEventListener('click', () => {
+    addFastTap(btnHideCent, () => {
       appState.toggleShowCentsInAnswer();
     });
   }
@@ -97,7 +97,7 @@ function setupEventListeners() {
   // OK/Next ボタン
   const btnOkNext = document.getElementById('btn-ok-next');
   if (btnOkNext) {
-    btnOkNext.addEventListener('click', handleOkNextClick);
+    addFastTap(btnOkNext, handleOkNextClick);
   }
   
   // 難易度セレクタ
@@ -111,12 +111,39 @@ function setupEventListeners() {
   // 音声テスト用ボタン
   const btnTestAudio = document.getElementById('btn-test-audio');
   if (btnTestAudio) {
-    btnTestAudio.addEventListener('click', handleTestAudioClick);
+    addFastTap(btnTestAudio, handleTestAudioClick);
   }
 
   // 任意の場所クリックで Audio 初期化（ブラウザポリシー対応）
   document.body.addEventListener('click', initAudioOnFirstInteraction, { once: true });
   document.body.addEventListener('touchstart', initAudioOnFirstInteraction, { once: true });
+}
+
+/**
+ * モバイルのクリック遅延を回避して即時反応させる
+ * @param {HTMLElement} el
+ * @param {(event: Event) => void} handler
+ */
+function addFastTap(el, handler) {
+  let skipClick = false;
+
+  el.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse') return;
+    e.preventDefault();
+    skipClick = true;
+    handler(e);
+    setTimeout(() => {
+      skipClick = false;
+    }, 400);
+  }, { passive: false });
+
+  el.addEventListener('click', (e) => {
+    if (skipClick) {
+      e.preventDefault();
+      return;
+    }
+    handler(e);
+  });
 }
 
 /**
