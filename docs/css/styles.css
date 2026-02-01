@@ -132,12 +132,6 @@ main {
   align-items: center;
   justify-content: center;
 }
-  top: 50%;
-  left: 0;
-  right: 0;
-  transform: translateY(-50%);
-  transition: transform 0.1s ease-out;
-}
 
 .wheel-item {
   height: 15px;
