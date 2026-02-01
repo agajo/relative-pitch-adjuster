@@ -177,7 +177,7 @@ export class AppState {
     const maxDiff = Math.max(
       ...this._fixedAnswerCents.map((_, i) => Math.abs(this.oneDifference(i)))
     );
-    this._isCleared = maxDiff < this._threshold;
+    this._isCleared = maxDiff <= this._threshold;
   }
 
   /**
