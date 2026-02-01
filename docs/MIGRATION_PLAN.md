@@ -177,13 +177,13 @@ ListWheelScrollView(
 | 4-2 | 正誤判定・クリア処理 | answer(), goToNext() | `js/state.js` | ✅ |
 | 4-3 | OK/Next/Retry ボタン | 状態に応じた表示切替 | `js/main.js` | ✅ |
 
-### Phase 5: 補助機能（優先度: 中）
-| # | タスク | 詳細 | 見積 |
-|---|--------|------|------|
-| 5-1 | 難易度セレクタ | 5段階選択UI | 30分 |
-| 5-2 | Hide Cent ボタン | セント表示トグル | 15分 |
-| 5-3 | Last Differences 表示 | 履歴表示コンポーネント | 45分 |
-| 5-4 | localStorage 永続化 | 履歴の保存・読み込み | 30分 |
+### Phase 5: 補助機能（優先度: 中）✅ 完了 (2026-02-01)
+| # | タスク | 詳細 | 実装先 | 状態 |
+|---|--------|------|--------|------|
+| 5-1 | 難易度セレクタ | 5段階選択UI | `index.html`, `js/main.js`, `js/state.js` | ✅ |
+| 5-2 | Hide Cent ボタン | セント表示トグル | `js/main.js`, `js/note.js` | ✅ |
+| 5-3 | Last Differences 表示 | 履歴表示コンポーネント | `index.html`, `js/main.js`, `css/styles.css` | ✅ |
+| 5-4 | localStorage 永続化 | 履歴の保存・読み込み | `js/state.js` | ✅ |
 
 ### Phase 6: 仕上げ（優先度: 低）
 | # | タスク | 詳細 | 見積 |
@@ -298,8 +298,13 @@ Si  → purple-500
 - [x] `js/state.js` に answer(), goToNext() 実装
 - [x] `js/main.js` の OK/Next/Retry 表示切替
 
-### Phase 5〜6: 未実装
-- [ ] `js/storage.js` 実装
+### Phase 5: 補助機能 ✅ 完了 (2026-02-01)
+- [x] 難易度セレクタ (`index.html`, `js/main.js`, `js/state.js`)
+- [x] Hide Cent ボタン (`js/main.js`, `js/note.js`)
+- [x] Last Differences 表示 (`index.html`, `js/main.js`, `css/styles.css`)
+- [x] localStorage 永続化 (`js/state.js`)
+
+### Phase 6: 未実装
 - [ ] 動作テスト
 - [ ] GitHub Pages 公開設定
 
