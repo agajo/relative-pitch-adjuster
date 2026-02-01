@@ -39,6 +39,7 @@ export class WheelSelector {
     this._lastTime = 0;
     this._animationId = null;
     this._momentumAnimationId = null;
+    this._feedbackTimer = null;
 
     // DOM要素
     this._track = null;
@@ -215,6 +216,7 @@ export class WheelSelector {
     this._lastTime = performance.now();
 
     this.container.classList.add('wheel-dragging');
+    this._clearFeedback();
     this.onDragStart();
   }
 
@@ -237,6 +239,11 @@ export class WheelSelector {
     if (dt > 0) {
       this._velocity = (currentY - this._lastY) / dt;
     }
+
+    // ホイール全体を少し上下に動かして操作感を出す
+    const deltaSinceLast = currentY - this._lastY;
+    this._setFeedback(deltaSinceLast * 0.4, false);
+
     this._lastY = currentY;
     this._lastTime = currentTime;
 
@@ -259,6 +266,7 @@ export class WheelSelector {
 
     this._isDragging = false;
     this.container.classList.remove('wheel-dragging');
+    this._clearFeedback();
     this.onDragEnd();
 
     // 慣性スクロール
@@ -279,6 +287,8 @@ export class WheelSelector {
     // deltaY を正規化（ブラウザによって値が異なる）
     const delta = Math.sign(e.deltaY) * Math.ceil(Math.abs(e.deltaY) / 50);
     const newIndex = this._currentIndex + delta;
+
+    this._setFeedback(Math.sign(e.deltaY) * 6, true);
     
     if (newIndex !== this._currentIndex) {
       this._currentIndex = newIndex;
@@ -367,6 +377,38 @@ export class WheelSelector {
   }
 
   /**
+   * 操作フィードバック（ホイール全体の微妙な上下動）
+   * @param {number} amount
+   * @param {boolean} autoReset
+   */
+  _setFeedback(amount, autoReset) {
+    const clamped = Math.max(-8, Math.min(8, amount));
+    this.container.style.setProperty('--wheel-nudge', `${clamped}px`);
+
+    if (autoReset) {
+      if (this._feedbackTimer) {
+        clearTimeout(this._feedbackTimer);
+      }
+      this._feedbackTimer = setTimeout(() => {
+        this._clearFeedback();
+      }, 120);
+    }
+  }
+
+  /**
+   * フィードバックをリセット
+   */
+  _clearFeedback() {
+    if (this._feedbackTimer) {
+      clearTimeout(this._feedbackTimer);
+      this._feedbackTimer = null;
+    }
+    if (this.container) {
+      this.container.style.setProperty('--wheel-nudge', '0px');
+    }
+  }
+
+  /**
    * イベントから Y 座標を取得
    * @param {MouseEvent|TouchEvent} e
    * @returns {number}
@@ -387,6 +429,10 @@ export class WheelSelector {
     }
     if (this._momentumAnimationId) {
       cancelAnimationFrame(this._momentumAnimationId);
+    }
+    if (this._feedbackTimer) {
+      clearTimeout(this._feedbackTimer);
+      this._feedbackTimer = null;
     }
     this.container.innerHTML = '';
   }

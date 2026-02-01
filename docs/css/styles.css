@@ -104,6 +104,7 @@ button,
   height: 120px;
   position: relative;
   overflow: hidden;
+  --wheel-nudge: 0px;
   background: linear-gradient(
     to bottom,
     rgba(17, 24, 39, 0.95) 0%,
@@ -116,6 +117,9 @@ button,
   border-radius: 0.5rem;
   cursor: ns-resize;
   touch-action: none;
+  transform: translateY(var(--wheel-nudge));
+  transition: transform 120ms ease-out;
+  will-change: transform;
 }
 
 .wheel-container.wheel-disabled {
@@ -125,6 +129,7 @@ button,
 
 .wheel-container.wheel-dragging {
   cursor: grabbing;
+  transition: transform 30ms linear;
 }
 
 .wheel-track {
@@ -180,24 +185,25 @@ button,
 .wheel-indicator::after {
   content: '';
   position: absolute;
-  top: 50%;
   width: 0;
   height: 0;
   border-style: solid;
 }
 
 .wheel-indicator::before {
-  left: 0;
-  border-width: 5px 8px 5px 0;
-  border-color: transparent #06b6d4 transparent transparent;
-  transform: translateY(-50%);
+  left: 50%;
+  top: -10px;
+  border-width: 0 6px 8px 6px;
+  border-color: transparent transparent #06b6d4 transparent;
+  transform: translateX(-50%);
 }
 
 .wheel-indicator::after {
-  right: 0;
-  border-width: 5px 0 5px 8px;
-  border-color: transparent transparent transparent #06b6d4;
-  transform: translateY(-50%);
+  left: 50%;
+  bottom: -10px;
+  border-width: 8px 6px 0 6px;
+  border-color: #06b6d4 transparent transparent transparent;
+  transform: translateX(-50%);
 }
 
 /* ===== ボタン ===== */
