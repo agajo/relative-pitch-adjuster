@@ -3,7 +3,7 @@
  * Flutter の NoteContainer と QuestionNote を JavaScript で再現
  */
 
-import { Note, RelativeNames, centToIndex } from './constants.js';
+import { Note, formatRelativeName, centToIndex } from './constants.js';
 import { WheelSelector } from './wheel.js';
 import { getAppState } from './state.js';
 import { getAudio, centToFrequency } from './audio.js';
@@ -176,7 +176,7 @@ export class QuestionNoteComponent {
     const header = document.createElement('div');
     header.className = 'note-card__header';
     header.style.backgroundColor = this._note.solfege.color;
-    header.textContent = this._note.solfege.name;
+    header.textContent = formatRelativeName(this.relativeIndex);
 
     card.appendChild(header);
 
@@ -203,14 +203,14 @@ export class QuestionNoteComponent {
     const correctHeader = this._correctNoteEl.querySelector('.note-card__header');
     if (correctHeader) {
       correctHeader.style.backgroundColor = this._note.solfege.color;
-      correctHeader.textContent = this._note.solfege.name;
+      correctHeader.textContent = formatRelativeName(this.relativeIndex);
     }
 
     // 回答音符のヘッダー更新
     const answerHeader = this._answerNoteEl.querySelector('.note-card__header');
     if (answerHeader) {
       answerHeader.style.backgroundColor = this._note.solfege.color;
-      answerHeader.textContent = this._note.solfege.name;
+      answerHeader.textContent = formatRelativeName(this.relativeIndex);
     }
   }
 

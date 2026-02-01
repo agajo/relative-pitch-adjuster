@@ -48,6 +48,21 @@ export const RelativeNames = Object.freeze([
 ]);
 
 /**
+ * Relative インデックスから表示用の音名を取得
+ * 基準 Do4 は "Do"、上は "↑"、下は "↓" を付ける
+ * @param {number} relativeIndex
+ * @returns {string}
+ */
+export function formatRelativeName(relativeIndex) {
+  const note = Note.fromRelative(relativeIndex);
+  if (relativeIndex === Relative.Do4) {
+    return note.solfege.name;
+  }
+  const direction = relativeIndex > Relative.Do4 ? '↑' : '↓';
+  return `${note.solfege.name}${direction}`;
+}
+
+/**
  * 音符クラス
  * Relative から Solfege とセント値を導出
  */

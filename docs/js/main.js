@@ -4,7 +4,7 @@
  */
 
 import { getAppState } from './state.js';
-import { Relative, RelativeNames, Note } from './constants.js';
+import { Relative, RelativeNames, Note, formatRelativeName } from './constants.js';
 import { getAudio, centToFrequency } from './audio.js';
 import { NotesContainer } from './note.js';
 
@@ -374,10 +374,11 @@ function updateLastDifferences() {
     const relativeIndex = RelativeNames.indexOf(name);
     const note = Note.fromRelative(relativeIndex);
     const noteColor = note.solfege.color;
+    const displayName = formatRelativeName(relativeIndex);
     
     html += `
       <div class="difference-item" style="background-color: ${noteColor}22;">
-        <span class="difference-item__name" style="color: ${noteColor};">${name}</span>
+        <span class="difference-item__name" style="color: ${noteColor};">${displayName}</span>
         <span class="difference-item__value ${colorClass}">${value}</span>
       </div>
     `;
