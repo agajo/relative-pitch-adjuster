@@ -432,6 +432,8 @@ select {
   color: #9ca3af;
   font-family: 'SF Mono', Monaco, 'Consolas', monospace;
   margin-top: 0.25rem;
+  min-height: 1rem;
+  line-height: 1rem;
 }
 
 .wheel-wrapper {

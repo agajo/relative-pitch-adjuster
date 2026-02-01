@@ -55,11 +55,6 @@
       
       <!-- ボタンエリア -->
       <div class="flex gap-4 mt-6">
-        <button id="btn-start"
-                class="px-5 py-2 bg-emerald-500 hover:bg-emerald-400 text-gray-900 font-bold rounded-lg transition-colors"
-                title="Start the session and enable audio">
-          Start
-        </button>
         <button id="btn-hide-cent" 
                 class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors">
           Hide Cent
@@ -74,6 +69,15 @@
       <div class="audio-status mt-4" aria-live="polite">
         <span class="audio-status__label">Audio</span>
         <span id="audio-indicator" class="audio-indicator" title="Audio idle"></span>
+      </div>
+
+      <!-- Start ボタン -->
+      <div class="flex justify-center mt-3">
+        <button id="btn-start"
+                class="px-5 py-2 bg-emerald-500 hover:bg-emerald-400 text-gray-900 font-bold rounded-lg transition-colors"
+                title="Start the session and enable audio">
+          Start
+        </button>
       </div>
 
     </div>

@@ -99,9 +99,10 @@ export class QuestionNoteComponent {
     if (state.didAnswer && state.doShowCentInAnswer) {
       const prefix = cent >= 0 ? '+' : '';
       this._answerCentEl.textContent = `${prefix}${cent}`;
-      this._answerCentEl.style.display = 'block';
+      this._answerCentEl.style.visibility = 'visible';
     } else {
-      this._answerCentEl.style.display = 'none';
+      this._answerCentEl.textContent = '';
+      this._answerCentEl.style.visibility = 'hidden';
     }
   }
 
@@ -131,7 +132,8 @@ export class QuestionNoteComponent {
     // 回答セント表示
     this._answerCentEl = document.createElement('div');
     this._answerCentEl.className = 'answer-cent-display';
-    this._answerCentEl.style.display = 'none';
+    this._answerCentEl.style.display = 'block';
+    this._answerCentEl.style.visibility = 'hidden';
     
     answerWrapper.appendChild(this._answerNoteEl);
     answerWrapper.appendChild(this._answerCentEl);

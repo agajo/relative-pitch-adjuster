@@ -56,18 +56,24 @@ async function initializeApp() {
   
   // デバッグ情報の出力
   logDebugInfo();
-  
-  // Audio の初期化は Start ボタンで実行される
-  console.log('Audio will be initialized on Start button');
+
+  // 画面表示時に Audio 初期化を試行（失敗しても Start で再試行）
+  audio.initialize().catch((err) => {
+    console.error('Failed to initialize audio on load:', err);
+  });
+
+  console.log('Audio initialization requested on load');
 }
 
 /**
  * 最初の問題を開始
  */
 async function startFirstQuestion() {
-  // Audio が初期化されていなければ初期化を試みる
+  // Audio が初期化されていなければ初期化を試みる（Start での再試行が優先）
   if (!audio.isInitialized) {
-    await audio.initialize();
+    audio.initialize().catch((err) => {
+      console.error('Failed to initialize audio:', err);
+    });
   }
 
   // 次の問題へ（animateCallback付き）
@@ -146,24 +152,14 @@ function addFastTap(el, handler) {
   });
 }
 
-/**
- * 最初のユーザーインタラクションで Audio を初期化
- */
 async function handleStartClick() {
   if (hasStarted) return;
 
   const btnStart = document.getElementById('btn-start');
   if (btnStart) {
     btnStart.disabled = true;
-    btnStart.textContent = 'Starting...';
   }
 
-  const success = await audio.initialize();
-  if (!success) {
-    console.error('Failed to initialize audio');
-  }
-
-  await startFirstQuestion();
   hasStarted = true;
 
   if (btnStart) {
@@ -172,6 +168,14 @@ async function handleStartClick() {
   }
 
   updateUI();
+
+  audio.initialize().catch((err) => {
+    console.error('Failed to initialize audio:', err);
+  });
+
+  startFirstQuestion().catch((err) => {
+    console.error('Failed to start first question:', err);
+  });
 }
 
 /**
