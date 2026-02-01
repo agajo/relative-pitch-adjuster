@@ -17,6 +17,9 @@ const audio = getAudio();
 // 音符コンテナ
 let notesContainer = null;
 
+// スタート済みかどうか
+let hasStarted = false;
+
 /**
  * DOM が読み込まれたら初期化
  */
@@ -47,17 +50,15 @@ async function initializeApp() {
   
   // 初期表示の更新
   updateUI();
+
+  // Audio インジケーター更新ループ
+  startAudioIndicatorLoop();
   
   // デバッグ情報の出力
   logDebugInfo();
   
-  // Audio の初期化（ユーザーインタラクション後に実行される）
-  console.log('Audio will be initialized on first user interaction');
-
-  // 1秒後に最初の問題を生成
-  setTimeout(async () => {
-    await startFirstQuestion();
-  }, 1000);
+  // Audio の初期化は Start ボタンで実行される
+  console.log('Audio will be initialized on Start button');
 }
 
 /**
@@ -86,10 +87,17 @@ async function startFirstQuestion() {
  * イベントリスナーの設定
  */
 function setupEventListeners() {
+  // Start ボタン
+  const btnStart = document.getElementById('btn-start');
+  if (btnStart) {
+    addFastTap(btnStart, handleStartClick);
+  }
+
   // Hide Cent ボタン
   const btnHideCent = document.getElementById('btn-hide-cent');
   if (btnHideCent) {
     addFastTap(btnHideCent, () => {
+      if (!hasStarted || !appState.didAnswer) return;
       appState.toggleShowCentsInAnswer();
     });
   }
@@ -108,15 +116,7 @@ function setupEventListeners() {
     });
   }
 
-  // 音声テスト用ボタン
-  const btnTestAudio = document.getElementById('btn-test-audio');
-  if (btnTestAudio) {
-    addFastTap(btnTestAudio, handleTestAudioClick);
-  }
-
-  // 任意の場所クリックで Audio 初期化（ブラウザポリシー対応）
-  document.body.addEventListener('click', initAudioOnFirstInteraction, { once: true });
-  document.body.addEventListener('touchstart', initAudioOnFirstInteraction, { once: true });
+  // 任意クリックでの Audio 初期化は廃止（Start ボタンに統一）
 }
 
 /**
@@ -149,19 +149,37 @@ function addFastTap(el, handler) {
 /**
  * 最初のユーザーインタラクションで Audio を初期化
  */
-async function initAudioOnFirstInteraction() {
-  if (!audio.isInitialized) {
-    const success = await audio.initialize();
-    if (success) {
-      console.log('Audio initialized on user interaction');
-    }
+async function handleStartClick() {
+  if (hasStarted) return;
+
+  const btnStart = document.getElementById('btn-start');
+  if (btnStart) {
+    btnStart.disabled = true;
+    btnStart.textContent = 'Starting...';
   }
+
+  const success = await audio.initialize();
+  if (!success) {
+    console.error('Failed to initialize audio');
+  }
+
+  await startFirstQuestion();
+  hasStarted = true;
+
+  if (btnStart) {
+    btnStart.classList.add('hidden');
+    btnStart.setAttribute('aria-hidden', 'true');
+  }
+
+  updateUI();
 }
 
 /**
  * OK/Next ボタンのクリックハンドラ
  */
 async function handleOkNextClick() {
+  if (!hasStarted) return;
+
   // Audio が初期化されていなければ初期化
   if (!audio.isInitialized) {
     await audio.initialize();
@@ -188,22 +206,6 @@ async function handleOkNextClick() {
 /**
  * 音声テストボタンのクリックハンドラ
  */
-async function handleTestAudioClick() {
-  // Audio が初期化されていなければ初期化
-  if (!audio.isInitialized) {
-    const success = await audio.initialize();
-    if (!success) {
-      console.error('Failed to initialize audio');
-      return;
-    }
-  }
-
-  // Do4 の音を鳴らす
-  const do4Freq = appState.do4Frequency;
-  console.log(`Playing Do4 at ${do4Freq.toFixed(2)} Hz`);
-  audio.playLong(do4Freq);
-}
-
 /**
  * 指定したセント値の音を再生
  * @param {number} cent - セント値
@@ -242,6 +244,7 @@ function updateUI() {
   updateOkNextButton();
   updateHideCentButton();
   updateLastDifferences();
+  updateAudioIndicator();
 }
 
 /**
@@ -263,6 +266,14 @@ function updateOkNextButton() {
     btn.textContent = 'OK!';
     btn.className = 'px-6 py-2 bg-cyan-500 hover:bg-cyan-400 text-gray-900 font-bold rounded-lg transition-colors';
   }
+
+  if (!hasStarted) {
+    btn.disabled = true;
+    btn.classList.add('opacity-60', 'cursor-not-allowed', 'pointer-events-none');
+  } else {
+    btn.disabled = false;
+    btn.classList.remove('opacity-60', 'cursor-not-allowed', 'pointer-events-none');
+  }
 }
 
 /**
@@ -273,6 +284,14 @@ function updateHideCentButton() {
   if (!btn) return;
   
   btn.textContent = appState.doShowCentInAnswer ? 'Hide Cent' : 'Show Cent';
+
+  const shouldEnable = hasStarted && appState.didAnswer;
+  btn.disabled = !shouldEnable;
+  if (shouldEnable) {
+    btn.className = 'px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors';
+  } else {
+    btn.className = 'px-4 py-2 bg-gray-700 text-gray-400 rounded-lg opacity-60 cursor-not-allowed';
+  }
 }
 
 /**
@@ -319,6 +338,32 @@ function updateLastDifferences() {
   
   html += '</div>';
   container.innerHTML = html;
+}
+
+/**
+ * Audio インジケーター更新
+ */
+function updateAudioIndicator() {
+  const indicator = document.getElementById('audio-indicator');
+  if (!indicator) return;
+
+  indicator.classList.remove('audio-indicator--playing');
+
+  if (audio.isPlaying) {
+    indicator.classList.add('audio-indicator--playing');
+    indicator.title = 'Audio playing';
+  } else {
+    indicator.title = 'Audio idle';
+  }
+}
+
+/**
+ * Audio インジケーターの定期更新
+ */
+function startAudioIndicatorLoop() {
+  setInterval(() => {
+    updateAudioIndicator();
+  }, 120);
 }
 
 /**
