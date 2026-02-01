@@ -170,12 +170,12 @@ ListWheelScrollView(
 | 3-2 | **Wheel Selector (`wheel.js`)** | ★メインの難所 | ✅ |
 | 3-3 | QuestionNote 統合 | 差分表示 + NoteContainer + Wheel | ✅ |
 
-### Phase 4: ゲームロジック（優先度: 高）
-| # | タスク | 詳細 | 見積 |
-|---|--------|------|------|
-| 4-1 | 問題生成 (`question.js`) | generateRelativeIndexes ロジック | 45分 |
-| 4-2 | 正誤判定・クリア処理 | answer(), goToNext() | 45分 |
-| 4-3 | OK/Next/Retry ボタン | 状態に応じた表示切替 | 30分 |
+### Phase 4: ゲームロジック（優先度: 高）✅ 完了 (2026-02-01)
+| # | タスク | 詳細 | 実装先 | 状態 |
+|---|--------|------|--------|------|
+| 4-1 | 問題生成 | generateRelativeIndexes ロジック | `js/state.js` | ✅ |
+| 4-2 | 正誤判定・クリア処理 | answer(), goToNext() | `js/state.js` | ✅ |
+| 4-3 | OK/Next/Retry ボタン | 状態に応じた表示切替 | `js/main.js` | ✅ |
 
 ### Phase 5: 補助機能（優先度: 中）
 | # | タスク | 詳細 | 見積 |
@@ -293,8 +293,12 @@ Si  → purple-500
   - Wheel アニメーション連携
 - [x] UI/CSS の調整
 
-### Phase 4〜6: 未実装
-- [ ] `js/question.js` 実装
+### Phase 4: ゲームロジック ✅ 完了 (2026-02-01)
+- [x] `js/state.js` に generateRelativeIndexes 実装
+- [x] `js/state.js` に answer(), goToNext() 実装
+- [x] `js/main.js` の OK/Next/Retry 表示切替
+
+### Phase 5〜6: 未実装
 - [ ] `js/storage.js` 実装
 - [ ] 動作テスト
 - [ ] GitHub Pages 公開設定
@@ -313,4 +317,4 @@ Si  → purple-500
 
 ---
 
-*作成日: 2026年1月31日*
+*作成日: 2026年1月31日 / 更新日: 2026年2月1日*
