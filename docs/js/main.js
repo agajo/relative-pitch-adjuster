@@ -276,7 +276,7 @@ function showResultBanner(isCleared) {
   const banner = document.getElementById('result-banner');
   if (!banner) return;
 
-  banner.textContent = isCleared ? 'クリア！' : '残念…';
+  banner.textContent = isCleared ? 'Correct!' : 'Incorrect';
   banner.classList.remove('hidden');
   banner.classList.toggle('result-banner--success', isCleared);
   banner.classList.toggle('result-banner--failure', !isCleared);
