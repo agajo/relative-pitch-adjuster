@@ -122,7 +122,9 @@ function setupEventListeners() {
     });
   }
 
-  // 任意クリックでの Audio 初期化は廃止（Start ボタンに統一）
+  // 最初のタップ/クリックで Audio を初期化（Start とは独立）
+  document.body.addEventListener('touchstart', initAudioOnFirstInteraction, { once: true, passive: true });
+  document.body.addEventListener('click', initAudioOnFirstInteraction, { once: true });
 }
 
 /**
@@ -150,6 +152,19 @@ function addFastTap(el, handler) {
     }
     handler(e);
   });
+}
+
+/**
+ * 最初のユーザーインタラクションで Audio を初期化
+ */
+async function initAudioOnFirstInteraction() {
+  if (!audio.isInitialized) {
+    try {
+      await audio.initialize();
+    } catch (err) {
+      console.error('Failed to initialize audio on first interaction:', err);
+    }
+  }
 }
 
 async function handleStartClick() {
