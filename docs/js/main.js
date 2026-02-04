@@ -5,7 +5,7 @@
 
 import { getAppState } from './state.js';
 import { Relative, RelativeNames, Note, formatRelativeName } from './constants.js';
-import { getAudio, centToFrequency } from './audio.js';
+import { getAudio, centToFrequency, getTimbrePresets, setTimbre, getCurrentTimbre } from './audio.js';
 import { NotesContainer } from './note.js';
 
 // グローバルな状態インスタンス
@@ -53,6 +53,9 @@ async function initializeApp() {
 
   // How to Play の多言語対応
   setupHowToPlay();
+
+  // 【開発用】音色セレクターの初期化
+  setupTimbreSelector();
 
   // Audio インジケーター更新ループ
   startAudioIndicatorLoop();
@@ -652,6 +655,78 @@ function startAudioIndicatorLoop() {
     updateAudioIndicator();
   }, 120);
 }
+
+// ============================================================
+// 【開発用】音色セレクター
+// 音色を決定したら、以下のセクション全体を削除してください。
+// 削除対象: setupTimbreSelector() 関数全体と、
+//           initializeApp() 内の setupTimbreSelector() 呼び出し行
+// ============================================================
+
+/**
+ * 【開発用】音色セレクターの初期化
+ * 音色決定後に削除
+ */
+function setupTimbreSelector() {
+  const select = document.getElementById('timbre-select');
+  const testBtn = document.getElementById('btn-test-timbre');
+  
+  if (!select || !testBtn) {
+    console.log('Timbre selector elements not found (may have been removed)');
+    return;
+  }
+  
+  // プリセット一覧を取得してセレクトボックスに追加
+  const presets = getTimbrePresets();
+  const currentKey = getCurrentTimbre();
+  
+  for (const [key, preset] of Object.entries(presets)) {
+    const option = document.createElement('option');
+    option.value = key;
+    option.textContent = preset.name;
+    if (key === currentKey) {
+      option.selected = true;
+    }
+    select.appendChild(option);
+  }
+  
+  // 音色変更イベント
+  select.addEventListener('change', async (e) => {
+    const key = e.target.value;
+    
+    // Audio が初期化されていなければ初期化
+    if (!audio.isInitialized) {
+      await audio.initialize();
+    }
+    
+    // 音色を変更
+    setTimbre(key, audio);
+  });
+  
+  // テスト再生ボタン
+  testBtn.addEventListener('click', async () => {
+    // Audio が初期化されていなければ初期化
+    if (!audio.isInitialized) {
+      await audio.initialize();
+    }
+    
+    // 現在の Do4 周波数で3秒間テスト再生
+    const testFrequency = appState.do4Frequency; // 通常 480Hz
+    audio.play(testFrequency);
+    
+    // 3秒後に停止
+    setTimeout(() => {
+      audio.stop();
+    }, 3000);
+    
+    console.log(`Test sound: ${testFrequency}Hz for 3 seconds`);
+  });
+  
+  console.log('Timbre selector initialized (dev feature)');
+}
+
+// 【開発用】音色セレクター ここまで
+// ============================================================
 
 /**
  * デバッグ情報をコンソールに出力
