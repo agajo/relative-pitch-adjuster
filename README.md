@@ -1,16 +1,18 @@
 # relative_pitch_adjuster
 
-A PWA to adjust your relative pitch.
+A relative pitch training app.
 
-## Getting Started
+## Maintenance policy (important)
 
-This project is a starting point for a Flutter application.
+- **Active development target: `docs/` JavaScript version (GitHub Pages).**
+- **Flutter version is no longer under active development.**
+- Unless explicitly stated otherwise, all implementation requests should be handled in the `docs/` directory.
 
-A few resources to get you started if this is your first Flutter project:
+## Run the web app locally
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+```bash
+cd docs
+python3 -m http.server 4173
+```
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Then open `http://localhost:4173`.

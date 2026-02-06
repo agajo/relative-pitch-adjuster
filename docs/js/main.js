@@ -54,7 +54,6 @@ async function initializeApp() {
   // How to Play の多言語対応
   setupHowToPlay();
 
-  // 【開発用】音色セレクターの初期化
   setupTimbreSelector();
 
   // Audio インジケーター更新ループ
@@ -656,23 +655,13 @@ function startAudioIndicatorLoop() {
   }, 120);
 }
 
-// ============================================================
-// 【開発用】音色セレクター
-// 音色を決定したら、以下のセクション全体を削除してください。
-// 削除対象: setupTimbreSelector() 関数全体と、
-//           initializeApp() 内の setupTimbreSelector() 呼び出し行
-// ============================================================
-
-/**
- * 【開発用】音色セレクターの初期化
- * 音色決定後に削除
- */
+/** 音色セレクターの初期化 */
 function setupTimbreSelector() {
   const select = document.getElementById('timbre-select');
   const testBtn = document.getElementById('btn-test-timbre');
   
   if (!select || !testBtn) {
-    console.log('Timbre selector elements not found (may have been removed)');
+    console.log('Timbre selector elements not found');
     return;
   }
   
@@ -710,23 +699,20 @@ function setupTimbreSelector() {
       await audio.initialize();
     }
     
-    // 現在の Do4 周波数で3秒間テスト再生
+    // 現在の Do4 周波数で1.5秒間テスト再生
     const testFrequency = appState.do4Frequency; // 通常 480Hz
     audio.play(testFrequency);
     
-    // 3秒後に停止
+    // 1.5秒後に停止
     setTimeout(() => {
       audio.stop();
-    }, 3000);
+    }, 1500);
     
-    console.log(`Test sound: ${testFrequency}Hz for 3 seconds`);
+    console.log(`Test sound: ${testFrequency}Hz for 1.5 seconds`);
   });
   
-  console.log('Timbre selector initialized (dev feature)');
+  console.log('Timbre selector initialized');
 }
-
-// 【開発用】音色セレクター ここまで
-// ============================================================
 
 /**
  * デバッグ情報をコンソールに出力
