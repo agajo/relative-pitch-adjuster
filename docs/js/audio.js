@@ -3,27 +3,11 @@
  * Flutter の js_caller.dart + my_audio.js を JavaScript に移植
  */
 
-// ============================================================
-// 【開発用】音色セレクター
-// 音色を決定したら、以下のセクションを削除してください：
-// 1. TIMBRE_PRESETS 定義全体
-// 2. currentTimbreKey 変数
-// 3. getTimbrePresets() 関数
-// 4. setTimbre() 関数
-// 5. getCurrentTimbre() 関数
-// 6. index.html の #timbre-selector セクション全体
-// 7. main.js の setupTimbreSelector() 関数と呼び出し
-// そして、createSynth() 内の選択した音色設定を直接記述してください。
-// ============================================================
-
-/**
- * 音色プリセット定義
- * 【開発用】最終的に1つに決めたら削除
- */
+/** 音色プリセット定義 */
 const TIMBRE_PRESETS = {
   // === 基本波形系（倍音減衰なし） ===
   'sine': {
-    name: '1. Sine (純音)',
+    name: '1. Sine',
     type: 'Synth',
     options: {
       oscillator: { type: 'sine' },
@@ -31,7 +15,7 @@ const TIMBRE_PRESETS = {
     }
   },
   'triangle': {
-    name: '2. Triangle (三角波)',
+    name: '2. Triangle',
     type: 'Synth',
     options: {
       oscillator: { type: 'triangle' },
@@ -41,7 +25,7 @@ const TIMBRE_PRESETS = {
   
   // === FMSynth系（FM合成、倍音が時間で変化） ===
   'fm-bell': {
-    name: '3. FM Bell (ベル風)',
+    name: '3. FM Bell',
     type: 'FMSynth',
     options: {
       harmonicity: 3.01,
@@ -53,7 +37,7 @@ const TIMBRE_PRESETS = {
     }
   },
   'fm-soft': {
-    name: '4. FM Soft (柔らかFM)',
+    name: '4. FM Soft',
     type: 'FMSynth',
     options: {
       harmonicity: 2,
@@ -65,7 +49,7 @@ const TIMBRE_PRESETS = {
     }
   },
   'fm-electric': {
-    name: '5. FM Electric (エレピ風)',
+    name: '5. FM Electric',
     type: 'FMSynth',
     options: {
       harmonicity: 1,
@@ -77,7 +61,7 @@ const TIMBRE_PRESETS = {
     }
   },
   'fm-warm': {
-    name: '6. FM Warm (温かみ)',
+    name: '6. FM Warm',
     type: 'FMSynth',
     options: {
       harmonicity: 0.5,
@@ -91,7 +75,7 @@ const TIMBRE_PRESETS = {
   
   // === AMSynth系（振幅変調） ===
   'am-tremolo': {
-    name: '7. AM Tremolo (トレモロ)',
+    name: '7. AM Tremolo',
     type: 'AMSynth',
     options: {
       harmonicity: 2,
@@ -102,7 +86,7 @@ const TIMBRE_PRESETS = {
     }
   },
   'am-rich': {
-    name: '8. AM Rich (リッチ)',
+    name: '8. AM Rich',
     type: 'AMSynth',
     options: {
       harmonicity: 3,
@@ -115,7 +99,7 @@ const TIMBRE_PRESETS = {
   
   // === PolySynth with Filter (フィルター付き) ===
   'filter-mellow': {
-    name: '9. Filter Mellow (まろやか)',
+    name: '9. Filter Mellow',
     type: 'MonoSynth',
     options: {
       oscillator: { type: 'sawtooth' },
@@ -125,7 +109,7 @@ const TIMBRE_PRESETS = {
     }
   },
   'filter-bright': {
-    name: '10. Filter Bright (明るい)',
+    name: '10. Filter Bright',
     type: 'MonoSynth',
     options: {
       oscillator: { type: 'sawtooth' },
@@ -135,7 +119,7 @@ const TIMBRE_PRESETS = {
     }
   },
   'filter-pluck': {
-    name: '11. Filter Pluck (プラック)',
+    name: '11. Filter Pluck',
     type: 'MonoSynth',
     options: {
       oscillator: { type: 'square' },
@@ -145,7 +129,7 @@ const TIMBRE_PRESETS = {
     }
   },
   'filter-pad': {
-    name: '12. Filter Pad (パッド)',
+    name: '12. Filter Pad',
     type: 'MonoSynth',
     options: {
       oscillator: { type: 'triangle' },
@@ -157,7 +141,7 @@ const TIMBRE_PRESETS = {
   
   // === カスタム倍音減衰（基本波形＋フィルター） ===
   'harmonic-decay-1': {
-    name: '13. Harmonic Decay Light (軽め減衰)',
+    name: '13. Harmonic Decay Light',
     type: 'MonoSynth',
     options: {
       oscillator: { type: 'sawtooth' },
@@ -167,7 +151,7 @@ const TIMBRE_PRESETS = {
     }
   },
   'harmonic-decay-2': {
-    name: '14. Harmonic Decay Medium (中程度減衰)',
+    name: '14. Harmonic Decay Medium',
     type: 'MonoSynth',
     options: {
       oscillator: { type: 'sawtooth' },
@@ -177,7 +161,7 @@ const TIMBRE_PRESETS = {
     }
   },
   'harmonic-decay-3': {
-    name: '15. Harmonic Decay Heavy (強め減衰)',
+    name: '15. Harmonic Decay Heavy',
     type: 'MonoSynth',
     options: {
       oscillator: { type: 'sawtooth' },
@@ -189,7 +173,7 @@ const TIMBRE_PRESETS = {
   
   // === 複合波形系 ===
   'fat-saw': {
-    name: '16. Fat Sawtooth (太いノコギリ)',
+    name: '16. Fat Sawtooth',
     type: 'Synth',
     options: {
       oscillator: { type: 'fatsawtooth', spread: 20, count: 3 },
@@ -197,7 +181,7 @@ const TIMBRE_PRESETS = {
     }
   },
   'fat-triangle': {
-    name: '17. Fat Triangle (太い三角)',
+    name: '17. Fat Triangle',
     type: 'Synth',
     options: {
       oscillator: { type: 'fattriangle', spread: 15, count: 3 },
@@ -205,7 +189,7 @@ const TIMBRE_PRESETS = {
     }
   },
   'pwm': {
-    name: '18. PWM (パルス幅変調)',
+    name: '18. PWM',
     type: 'Synth',
     options: {
       oscillator: { type: 'pwm', modulationFrequency: 0.5 },
@@ -215,7 +199,7 @@ const TIMBRE_PRESETS = {
   
   // === ピアノ風 ===
   'piano-like': {
-    name: '19. Piano-like (ピアノ風)',
+    name: '19. Piano-like',
     type: 'FMSynth',
     options: {
       harmonicity: 3,
@@ -229,7 +213,7 @@ const TIMBRE_PRESETS = {
   
   // === オルガン風 ===
   'organ-like': {
-    name: '20. Organ-like (オルガン風)',
+    name: '20. Organ-like',
     type: 'Synth',
     options: {
       oscillator: { type: 'sine', partials: [1, 0.5, 0.33, 0.25, 0.2, 0.16] },
@@ -238,11 +222,34 @@ const TIMBRE_PRESETS = {
   }
 };
 
-/** 現在選択中の音色キー【開発用】 */
-let currentTimbreKey = 'harmonic-decay-2';
+const TIMBRE_STORAGE_KEY = 'relative-pitch-adjuster.timbre';
+const DEFAULT_TIMBRE_KEY = 'fm-soft';
+
+/** 現在選択中の音色キー */
+let currentTimbreKey = DEFAULT_TIMBRE_KEY;
+
+function loadPersistedTimbre() {
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return;
+  }
+
+  const saved = window.localStorage.getItem(TIMBRE_STORAGE_KEY);
+  if (saved && TIMBRE_PRESETS[saved]) {
+    currentTimbreKey = saved;
+  }
+}
+
+function persistTimbre(key) {
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return;
+  }
+  window.localStorage.setItem(TIMBRE_STORAGE_KEY, key);
+}
+
+loadPersistedTimbre();
 
 /**
- * 音色プリセット一覧を取得【開発用】
+ * 音色プリセット一覧を取得
  * @returns {Object<string, {name: string}>}
  */
 export function getTimbrePresets() {
@@ -250,7 +257,7 @@ export function getTimbrePresets() {
 }
 
 /**
- * 現在の音色キーを取得【開発用】
+ * 現在の音色キーを取得
  * @returns {string}
  */
 export function getCurrentTimbre() {
@@ -258,7 +265,7 @@ export function getCurrentTimbre() {
 }
 
 /**
- * 音色を設定【開発用】
+ * 音色を設定
  * @param {string} key - 音色のキー
  * @param {Audio} audioInstance - Audio インスタンス
  */
@@ -268,6 +275,7 @@ export function setTimbre(key, audioInstance) {
     return;
   }
   currentTimbreKey = key;
+  persistTimbre(key);
   console.log(`Timbre changed to: ${TIMBRE_PRESETS[key].name}`);
   
   // 再初期化が必要
@@ -334,7 +342,7 @@ class Audio {
   }
 
   /**
-   * シンセを再初期化（音色変更時）【開発用】
+   * シンセを再初期化（音色変更時）
    * @private
    */
   _reinitializeSynth() {
