@@ -158,113 +158,109 @@ button,
   color: #34d399; /* green-400 */
 }
 
-/* ===== Wheel Selector ===== */
+/* ===== Wheel Picker ===== */
 
 .wheel-container {
   width: 4rem;
   height: 120px;
   position: relative;
   overflow: hidden;
-  --wheel-nudge: 0px;
-  background: linear-gradient(
-    to bottom,
-    rgba(17, 24, 39, 0.95) 0%,
-    rgba(17, 24, 39, 0.5) 25%,
-    transparent 45%,
-    transparent 55%,
-    rgba(17, 24, 39, 0.5) 75%,
-    rgba(17, 24, 39, 0.95) 100%
-  );
-  border-radius: 0.5rem;
-  cursor: ns-resize;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 0.75rem;
+  background: #111827;
+  cursor: grab;
   touch-action: none;
-  transform: translateY(var(--wheel-nudge));
-  transition: transform 120ms ease-out;
-  will-change: transform;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+}
+
+.wheel-container::before,
+.wheel-container::after {
+  content: '';
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  height: 42%;
+  pointer-events: none;
+}
+
+.wheel-container::before {
+  top: 0;
+  background: linear-gradient(to bottom, #111827 8%, rgba(17, 24, 39, 0));
+}
+
+.wheel-container::after {
+  bottom: 0;
+  background: linear-gradient(to top, #111827 8%, rgba(17, 24, 39, 0));
+}
+
+.wheel-container:focus-visible {
+  border-color: #22d3ee;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.28);
 }
 
 .wheel-container.wheel-disabled {
   cursor: default;
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
 .wheel-container.wheel-dragging {
   cursor: grabbing;
-  transition: transform 30ms linear;
 }
 
 .wheel-track {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  inset: 0;
+  transform-style: preserve-3d;
+  pointer-events: none;
 }
 
 .wheel-item {
-  height: 15px;
+  position: absolute;
+  top: 50%;
+  left: 0;
   width: 100%;
+  height: 15px;
+  margin-top: -7.5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: absolute;
-  left: 0;
-  top: 50%;
+  transform-origin: center center;
+  will-change: transform, opacity;
 }
 
 .wheel-item__bar {
-  width: 75%;
+  width: 62%;
   height: 4px;
-  border-radius: 2px;
-  opacity: 0.4;
-  transition: opacity 0.1s, height 0.1s;
+  border-radius: 9999px;
+  opacity: 0.58;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
+  transition: width 100ms ease, height 100ms ease, opacity 100ms ease;
 }
 
 .wheel-item--selected .wheel-item__bar {
-  opacity: 1;
+  width: 78%;
   height: 6px;
+  opacity: 1;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
 
-/* 中央インジケーター */
+/* CupertinoPicker の selection overlay に相当する中央選択枠 */
 .wheel-indicator {
   position: absolute;
+  z-index: 4;
   top: 50%;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: #06b6d4; /* cyan-500 */
+  left: 0.25rem;
+  right: 0.25rem;
+  height: 22px;
+  border-top: 1px solid rgba(34, 211, 238, 0.55);
+  border-bottom: 1px solid rgba(34, 211, 238, 0.55);
+  border-radius: 0.35rem;
+  background: rgba(6, 182, 212, 0.06);
   transform: translateY(-50%);
   pointer-events: none;
-  z-index: 10;
-}
-
-.wheel-indicator::before,
-.wheel-indicator::after {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 0;
-  border-style: solid;
-}
-
-.wheel-indicator::before {
-  left: 50%;
-  top: -10px;
-  border-width: 0 6px 8px 6px;
-  border-color: transparent transparent #06b6d4 transparent;
-  transform: translateX(-50%);
-}
-
-.wheel-indicator::after {
-  left: 50%;
-  bottom: -10px;
-  border-width: 8px 6px 0 6px;
-  border-color: #06b6d4 transparent transparent transparent;
-  transform: translateX(-50%);
 }
 
 /* ===== ボタン ===== */
