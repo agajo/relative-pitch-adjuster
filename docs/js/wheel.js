@@ -1,15 +1,59 @@
 /**
- * wheel.js - Wheel Selector コンポーネント
- * Flutter の ListWheelScrollView を JavaScript で再現
- * 
- * ★ Phase 3 の難所
+ * wheel.js - Wheel Picker コンポーネント
+ *
+ * Flutter の CupertinoPicker / ListWheelScrollView と同様に、固定幅の項目を
+ * 連続的にスクロールし、操作終了時に中央の項目へスナップさせる。
  */
 
 import { WheelConfig, indexToCent, centToIndex } from './constants.js';
 
+const VISIBLE_ITEM_COUNT = 17;
+const WHEEL_SNAP_DELAY = 120;
+const MAX_MOMENTUM_ITEMS = 80;
+
 /**
- * Wheel Selector クラス
- * ドラッグ/タッチで上下スクロールし、セント値を選択
+ * インデックスを Wheel の範囲内に制限する。
+ * @param {number} index
+ * @returns {number}
+ */
+export function clampWheelIndex(index) {
+  return Math.max(0, Math.min(WheelConfig.ITEM_COUNT - 1, index));
+}
+
+/**
+ * 連続スクロール位置から中央で選択されるインデックスを求める。
+ * @param {number} scrollIndex
+ * @returns {number}
+ */
+export function selectedIndexForScroll(scrollIndex) {
+  return Math.round(clampWheelIndex(scrollIndex));
+}
+
+/**
+ * ドラッグ量を連続スクロール位置へ変換する。
+ * @param {number} startIndex
+ * @param {number} deltaY
+ * @returns {number}
+ */
+export function scrollIndexForDrag(startIndex, deltaY) {
+  return clampWheelIndex(startIndex - deltaY / WheelConfig.ITEM_EXTENT);
+}
+
+/**
+ * リリース時の速度からスナップ先を求める。
+ * velocity は item / ms。短い投影時間を使い、極端な移動は制限する。
+ * @param {number} scrollIndex
+ * @param {number} velocity
+ * @returns {number}
+ */
+export function momentumTargetIndex(scrollIndex, velocity) {
+  const projectedItems = Math.max(-MAX_MOMENTUM_ITEMS, Math.min(MAX_MOMENTUM_ITEMS, velocity * 180));
+  return selectedIndexForScroll(scrollIndex + projectedItems);
+}
+
+/**
+ * Wheel Picker クラス
+ * ドラッグ、タッチ、マウスホイール、キーボードでセント値を選択する。
  */
 export class WheelSelector {
   /**
@@ -17,8 +61,8 @@ export class WheelSelector {
    * @param {HTMLElement} options.container - Wheel を配置するコンテナ要素
    * @param {string} options.color - バーの色 (hex)
    * @param {Function} options.onChange - 値変更時のコールバック (cent) => void
-   * @param {Function} options.onDragStart - ドラッグ開始時のコールバック
-   * @param {Function} options.onDragEnd - ドラッグ終了時のコールバック
+   * @param {Function} options.onDragStart - 操作開始時のコールバック
+   * @param {Function} options.onDragEnd - 操作終了時のコールバック
    * @param {boolean} options.disabled - 無効化フラグ
    */
   constructor(options) {
@@ -29,103 +73,66 @@ export class WheelSelector {
     this.onDragEnd = options.onDragEnd || (() => {});
     this.disabled = options.disabled || false;
 
-    // 内部状態
-    this._currentIndex = WheelConfig.CENTER_INDEX; // 0セント位置
+    this._currentIndex = WheelConfig.CENTER_INDEX;
+    this._scrollIndex = WheelConfig.CENTER_INDEX;
     this._isDragging = false;
     this._startY = 0;
-    this._startIndex = 0;
+    this._startScrollIndex = 0;
     this._velocity = 0;
     this._lastY = 0;
     this._lastTime = 0;
     this._animationId = null;
-    this._momentumAnimationId = null;
-    this._feedbackTimer = null;
+    this._animationResolve = null;
+    this._wheelSnapTimer = null;
 
-    // DOM要素
     this._track = null;
     this._indicator = null;
 
-    // 初期化
+    this._boundDragStart = this._handleDragStart.bind(this);
+    this._boundDragMove = this._handleDragMove.bind(this);
+    this._boundDragEnd = this._handleDragEnd.bind(this);
+    this._boundWheel = this._handleWheel.bind(this);
+    this._boundKeyDown = this._handleKeyDown.bind(this);
+
     this._render();
     this._bindEvents();
   }
 
-  /**
-   * 現在のセント値を取得
-   * @returns {number}
-   */
+  /** @returns {number} */
   get cent() {
     return indexToCent(this._currentIndex);
   }
 
-  /**
-   * セント値を設定
-   * @param {number} cent
-   */
+  /** @param {number} cent */
   set cent(cent) {
-    this._currentIndex = centToIndex(cent);
-    this._updateTrackPosition(false);
-    this.onChange(cent);
+    const index = clampWheelIndex(centToIndex(cent));
+    this._scrollIndex = index;
+    this._setSelectedIndex(index, false);
+    this._updateTrackPosition();
+    this.onChange(this.cent);
   }
 
-  /**
-   * 無効化状態を設定
-   * @param {boolean} value
-   */
+  /** @param {boolean} value */
   setDisabled(value) {
     this.disabled = value;
     this.container.classList.toggle('wheel-disabled', value);
+    this.container.setAttribute('aria-disabled', String(value));
+    this.container.tabIndex = value ? -1 : 0;
     this._updateBarColors();
   }
 
   /**
-   * 指定インデックスにアニメーションで移動
+   * 指定インデックスにアニメーションで移動する。
    * @param {number} targetIndex
    * @param {number} duration - ミリ秒
    * @returns {Promise<void>}
    */
   animateTo(targetIndex, duration = 200) {
-    return new Promise((resolve) => {
-      // 既存のアニメーションをキャンセル
-      if (this._animationId) {
-        cancelAnimationFrame(this._animationId);
-      }
-      if (this._momentumAnimationId) {
-        cancelAnimationFrame(this._momentumAnimationId);
-      }
-
-      const startIndex = this._currentIndex;
-      const startTime = performance.now();
-      const distance = targetIndex - startIndex;
-
-      const animate = (currentTime) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        // easeInOut
-        const eased = progress < 0.5
-          ? 2 * progress * progress
-          : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-
-        this._currentIndex = Math.round(startIndex + distance * eased);
-        this._clampIndex();
-        this._updateTrackPosition(false);
-
-        if (progress < 1) {
-          this._animationId = requestAnimationFrame(animate);
-        } else {
-          this._animationId = null;
-          this.onChange(this.cent);
-          resolve();
-        }
-      };
-
-      this._animationId = requestAnimationFrame(animate);
-    });
+    return this._animateToScrollIndex(clampWheelIndex(targetIndex), duration, false);
   }
 
   /**
-   * セント値にアニメーションで移動
+   * セント値にアニメーションで移動する。
    * @param {number} cent
    * @param {number} duration
    * @returns {Promise<void>}
@@ -134,306 +141,284 @@ export class WheelSelector {
     return this.animateTo(centToIndex(cent), duration);
   }
 
-  /**
-   * DOM をレンダリング
-   */
   _render() {
     this.container.innerHTML = '';
     this.container.classList.add('wheel-container');
+    this.container.classList.toggle('wheel-disabled', this.disabled);
+    this.container.tabIndex = this.disabled ? -1 : 0;
+    this.container.setAttribute('role', 'slider');
+    this.container.setAttribute('aria-label', 'Pitch adjustment in cents');
+    this.container.setAttribute('aria-valuemin', String(WheelConfig.MIN_CENT));
+    this.container.setAttribute('aria-valuemax', String(WheelConfig.MAX_CENT));
+    this.container.setAttribute('aria-disabled', String(this.disabled));
 
-    // トラック（スクロールする部分）
     this._track = document.createElement('div');
     this._track.className = 'wheel-track';
+    this._track.setAttribute('aria-hidden', 'true');
 
-    // 表示する範囲のアイテム数（パフォーマンスのため全3501個は作らない）
-    const visibleCount = 21; // 中央 ± 10個
-    
-    for (let i = 0; i < visibleCount; i++) {
+    const centerSlot = Math.floor(VISIBLE_ITEM_COUNT / 2);
+    for (let i = 0; i < VISIBLE_ITEM_COUNT; i++) {
       const item = document.createElement('div');
       item.className = 'wheel-item';
-      item.dataset.offset = i - Math.floor(visibleCount / 2);
-      
+      item.dataset.slot = String(i - centerSlot);
+
       const bar = document.createElement('div');
       bar.className = 'wheel-item__bar';
       bar.style.backgroundColor = this.disabled ? '#6b7280' : this.color;
-      
+
       item.appendChild(bar);
       this._track.appendChild(item);
     }
 
-    // インジケーター（中央線）
     this._indicator = document.createElement('div');
     this._indicator.className = 'wheel-indicator';
+    this._indicator.setAttribute('aria-hidden', 'true');
 
     this.container.appendChild(this._track);
     this.container.appendChild(this._indicator);
-
-    this._updateTrackPosition(false);
+    this._updateTrackPosition();
   }
 
-  /**
-   * イベントをバインド
-   */
   _bindEvents() {
-    // マウスイベント
-    this.container.addEventListener('mousedown', this._handleDragStart.bind(this));
-    document.addEventListener('mousemove', this._handleDragMove.bind(this));
-    document.addEventListener('mouseup', this._handleDragEnd.bind(this));
-
-    // タッチイベント
-    this.container.addEventListener('touchstart', this._handleDragStart.bind(this), { passive: false });
-    document.addEventListener('touchmove', this._handleDragMove.bind(this), { passive: false });
-    document.addEventListener('touchend', this._handleDragEnd.bind(this));
-
-    // ホイールイベント
-    this.container.addEventListener('wheel', this._handleWheel.bind(this), { passive: false });
+    this.container.addEventListener('pointerdown', this._boundDragStart);
+    document.addEventListener('pointermove', this._boundDragMove);
+    document.addEventListener('pointerup', this._boundDragEnd);
+    document.addEventListener('pointercancel', this._boundDragEnd);
+    this.container.addEventListener('wheel', this._boundWheel, { passive: false });
+    this.container.addEventListener('keydown', this._boundKeyDown);
   }
 
-  /**
-   * ドラッグ開始
-   * @param {MouseEvent|TouchEvent} e
-   */
+  /** @param {PointerEvent} e */
   _handleDragStart(e) {
-    if (this.disabled) return;
+    if (this.disabled || (e.button !== undefined && e.button !== 0)) return;
 
     e.preventDefault();
-    
-    // 既存のアニメーションをキャンセル
-    if (this._animationId) {
-      cancelAnimationFrame(this._animationId);
-      this._animationId = null;
-    }
-    if (this._momentumAnimationId) {
-      cancelAnimationFrame(this._momentumAnimationId);
-      this._momentumAnimationId = null;
-    }
+    this._cancelAnimation();
+    this._clearWheelSnapTimer();
 
     this._isDragging = true;
-    this._startY = this._getEventY(e);
-    this._startIndex = this._currentIndex;
+    this._startY = e.clientY;
+    this._startScrollIndex = this._scrollIndex;
     this._velocity = 0;
     this._lastY = this._startY;
     this._lastTime = performance.now();
 
     this.container.classList.add('wheel-dragging');
-    this._clearFeedback();
+    this.container.focus({ preventScroll: true });
+    if (this.container.setPointerCapture && e.pointerId !== undefined) {
+      this.container.setPointerCapture(e.pointerId);
+    }
     this.onDragStart();
   }
 
-  /**
-   * ドラッグ中
-   * @param {MouseEvent|TouchEvent} e
-   */
+  /** @param {PointerEvent} e */
   _handleDragMove(e) {
     if (!this._isDragging) return;
 
     e.preventDefault();
-    
-    const currentY = this._getEventY(e);
-    const deltaY = currentY - this._startY;
-    const deltaIndex = Math.round(deltaY / WheelConfig.ITEM_EXTENT);
-    
-    // 速度を計算（慣性用）
+    const currentY = e.clientY;
     const currentTime = performance.now();
     const dt = currentTime - this._lastTime;
-    if (dt > 0) {
-      this._velocity = (currentY - this._lastY) / dt;
-    }
 
-    // ホイール全体を少し上下に動かして操作感を出す
-    const deltaSinceLast = currentY - this._lastY;
-    this._setFeedback(deltaSinceLast * 0.4, false);
+    if (dt > 0) {
+      const instantVelocity = -(currentY - this._lastY) / WheelConfig.ITEM_EXTENT / dt;
+      this._velocity = this._velocity * 0.65 + instantVelocity * 0.35;
+    }
 
     this._lastY = currentY;
     this._lastTime = currentTime;
-
-    // インデックスを更新（ドラッグ方向とスクロール方向を合わせる）
-    const newIndex = this._startIndex - deltaIndex;
-    
-    if (newIndex !== this._currentIndex) {
-      this._currentIndex = newIndex;
-      this._clampIndex();
-      this._updateTrackPosition(true);
-      this.onChange(this.cent);
-    }
+    this._setScrollIndex(scrollIndexForDrag(this._startScrollIndex, currentY - this._startY), true);
   }
 
-  /**
-   * ドラッグ終了
-   */
   _handleDragEnd() {
     if (!this._isDragging) return;
 
     this._isDragging = false;
     this.container.classList.remove('wheel-dragging');
-    this._clearFeedback();
     this.onDragEnd();
-
-    // 慣性スクロール
-    if (Math.abs(this._velocity) > 0.1) {
-      this._startMomentum();
-    }
+    this._snapWithMomentum(this._velocity);
   }
 
-  /**
-   * マウスホイール
-   * @param {WheelEvent} e
-   */
+  /** @param {WheelEvent} e */
   _handleWheel(e) {
     if (this.disabled) return;
 
     e.preventDefault();
-    
-    // deltaY を正規化（ブラウザによって値が異なる）
-    const delta = Math.sign(e.deltaY) * Math.ceil(Math.abs(e.deltaY) / 50);
-    const newIndex = this._currentIndex + delta;
+    this._cancelAnimation();
+    this._clearWheelSnapTimer();
 
-    this._setFeedback(Math.sign(e.deltaY) * 6, true);
-    
-    if (newIndex !== this._currentIndex) {
-      this._currentIndex = newIndex;
-      this._clampIndex();
-      this._updateTrackPosition(true);
-      this.onChange(this.cent);
-    }
+    const lineHeight = WheelConfig.ITEM_EXTENT;
+    const pageHeight = this.container.clientHeight || 120;
+    const deltaPixels = e.deltaMode === 1
+      ? e.deltaY * lineHeight
+      : e.deltaMode === 2
+        ? e.deltaY * pageHeight
+        : e.deltaY;
+
+    this._setScrollIndex(this._scrollIndex + deltaPixels / WheelConfig.ITEM_EXTENT, true);
+    this._wheelSnapTimer = setTimeout(() => {
+      this._wheelSnapTimer = null;
+      this._snapWithMomentum(0);
+    }, WHEEL_SNAP_DELAY);
   }
 
-  /**
-   * 慣性スクロールを開始
-   */
-  _startMomentum() {
-    const friction = 0.95;
-    const minVelocity = 0.01;
+  /** @param {KeyboardEvent} e */
+  _handleKeyDown(e) {
+    if (this.disabled) return;
 
-    const animate = () => {
-      this._velocity *= friction;
-
-      if (Math.abs(this._velocity) < minVelocity) {
-        this._momentumAnimationId = null;
-        return;
-      }
-
-      // 速度に応じてインデックスを更新
-      const delta = Math.round(this._velocity * 10);
-      if (delta !== 0) {
-        this._currentIndex -= delta;
-        this._clampIndex();
-        this._updateTrackPosition(true);
-        this.onChange(this.cent);
-      }
-
-      this._momentumAnimationId = requestAnimationFrame(animate);
+    const stepByKey = {
+      ArrowUp: -1,
+      ArrowDown: 1,
+      PageUp: -10,
+      PageDown: 10
     };
 
-    this._momentumAnimationId = requestAnimationFrame(animate);
+    let target = null;
+    if (Object.hasOwn(stepByKey, e.key)) {
+      target = this._currentIndex + stepByKey[e.key];
+    } else if (e.key === 'Home') {
+      target = 0;
+    } else if (e.key === 'End') {
+      target = WheelConfig.ITEM_COUNT - 1;
+    }
+
+    if (target === null) return;
+    e.preventDefault();
+    this._cancelAnimation();
+    this._animateToScrollIndex(clampWheelIndex(target), 120, true);
   }
 
   /**
-   * インデックスを有効範囲内に制限
+   * @param {number} scrollIndex
+   * @param {boolean} notify
    */
-  _clampIndex() {
-    this._currentIndex = Math.max(0, Math.min(WheelConfig.ITEM_COUNT - 1, this._currentIndex));
+  _setScrollIndex(scrollIndex, notify) {
+    this._scrollIndex = clampWheelIndex(scrollIndex);
+    this._setSelectedIndex(selectedIndexForScroll(this._scrollIndex), notify);
+    this._updateTrackPosition();
   }
 
   /**
-   * トラック位置を更新
-   * @param {boolean} animated
+   * @param {number} index
+   * @param {boolean} notify
    */
-  _updateTrackPosition(animated) {
+  _setSelectedIndex(index, notify) {
+    if (index === this._currentIndex) return;
+    this._currentIndex = index;
+    this._updateAriaValue();
+    if (notify) this.onChange(this.cent);
+  }
+
+  _updateAriaValue() {
+    this.container.setAttribute('aria-valuenow', String(this.cent));
+    this.container.setAttribute('aria-valuetext', `${this.cent} cents`);
+  }
+
+  _updateTrackPosition() {
     if (!this._track) return;
 
-    // 現在のセント値
-    const cent = this.cent;
-    
-    // 相対オフセット（サブピクセル精度）
-    const subOffset = (cent % 1) * WheelConfig.ITEM_EXTENT;
-    
-    // トラック内の各アイテムのオフセットを更新
     const items = this._track.querySelectorAll('.wheel-item');
     items.forEach((item) => {
-      const offset = parseInt(item.dataset.offset, 10);
-      const itemCent = cent + offset;
-      
-      // 選択状態の更新
-      item.classList.toggle('wheel-item--selected', offset === 0);
-      
-      // 位置の更新
-      const y = offset * WheelConfig.ITEM_EXTENT - subOffset;
-      item.style.transform = `translateY(${y}px)`;
+      const slot = Number(item.dataset.slot);
+      const itemIndex = this._currentIndex + slot;
+      const distance = itemIndex - this._scrollIndex;
+      const absoluteDistance = Math.abs(distance);
+      const angle = Math.max(-75, Math.min(75, distance * 13));
+      const scale = Math.max(0.72, 1 - absoluteDistance * 0.045);
+      const opacity = itemIndex < 0 || itemIndex >= WheelConfig.ITEM_COUNT
+        ? 0
+        : Math.max(0.08, 1 - absoluteDistance * 0.13);
+
+      item.classList.toggle('wheel-item--selected', slot === 0);
+      item.style.opacity = String(opacity);
+      item.style.transform = `translateY(${distance * WheelConfig.ITEM_EXTENT}px) perspective(180px) rotateX(${angle}deg) scale(${scale})`;
     });
 
-    // トランジションの設定
-    this._track.style.transition = animated ? 'none' : 'transform 0.1s ease-out';
+    this._updateAriaValue();
   }
 
-  /**
-   * バーの色を更新
-   */
   _updateBarColors() {
     const bars = this._track.querySelectorAll('.wheel-item__bar');
-    bars.forEach(bar => {
+    bars.forEach((bar) => {
       bar.style.backgroundColor = this.disabled ? '#6b7280' : this.color;
     });
   }
 
-  /**
-   * 操作フィードバック（ホイール全体の微妙な上下動）
-   * @param {number} amount
-   * @param {boolean} autoReset
-   */
-  _setFeedback(amount, autoReset) {
-    const clamped = Math.max(-8, Math.min(8, amount));
-    this.container.style.setProperty('--wheel-nudge', `${clamped}px`);
-
-    if (autoReset) {
-      if (this._feedbackTimer) {
-        clearTimeout(this._feedbackTimer);
-      }
-      this._feedbackTimer = setTimeout(() => {
-        this._clearFeedback();
-      }, 120);
-    }
+  /** @param {number} velocity */
+  _snapWithMomentum(velocity) {
+    const target = momentumTargetIndex(this._scrollIndex, velocity);
+    const distance = Math.abs(target - this._scrollIndex);
+    const duration = Math.max(120, Math.min(420, 120 + distance * 7));
+    this._animateToScrollIndex(target, duration, true);
   }
 
   /**
-   * フィードバックをリセット
+   * @param {number} targetIndex
+   * @param {number} duration
+   * @param {boolean} notifyEachChange
+   * @returns {Promise<void>}
    */
-  _clearFeedback() {
-    if (this._feedbackTimer) {
-      clearTimeout(this._feedbackTimer);
-      this._feedbackTimer = null;
+  _animateToScrollIndex(targetIndex, duration, notifyEachChange) {
+    this._cancelAnimation();
+    const startIndex = this._scrollIndex;
+    const distance = targetIndex - startIndex;
+
+    if (distance === 0 || duration <= 0) {
+      this._setScrollIndex(targetIndex, notifyEachChange);
+      if (!notifyEachChange) this.onChange(this.cent);
+      return Promise.resolve();
     }
-    if (this.container) {
-      this.container.style.setProperty('--wheel-nudge', '0px');
-    }
+
+    return new Promise((resolve) => {
+      this._animationResolve = resolve;
+      const startTime = performance.now();
+      const animate = (currentTime) => {
+        const progress = Math.min((currentTime - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        this._setScrollIndex(startIndex + distance * eased, notifyEachChange);
+
+        if (progress < 1) {
+          this._animationId = requestAnimationFrame(animate);
+        } else {
+          this._animationId = null;
+          this._animationResolve = null;
+          this._setScrollIndex(targetIndex, notifyEachChange);
+          if (!notifyEachChange) this.onChange(this.cent);
+          resolve();
+        }
+      };
+
+      this._animationId = requestAnimationFrame(animate);
+    });
   }
 
-  /**
-   * イベントから Y 座標を取得
-   * @param {MouseEvent|TouchEvent} e
-   * @returns {number}
-   */
-  _getEventY(e) {
-    if (e.touches && e.touches.length > 0) {
-      return e.touches[0].clientY;
-    }
-    return e.clientY;
-  }
-
-  /**
-   * リソースを解放
-   */
-  destroy() {
+  _cancelAnimation() {
     if (this._animationId) {
       cancelAnimationFrame(this._animationId);
+      this._animationId = null;
     }
-    if (this._momentumAnimationId) {
-      cancelAnimationFrame(this._momentumAnimationId);
+    if (this._animationResolve) {
+      this._animationResolve();
+      this._animationResolve = null;
     }
-    if (this._feedbackTimer) {
-      clearTimeout(this._feedbackTimer);
-      this._feedbackTimer = null;
+  }
+
+  _clearWheelSnapTimer() {
+    if (this._wheelSnapTimer) {
+      clearTimeout(this._wheelSnapTimer);
+      this._wheelSnapTimer = null;
     }
+  }
+
+  destroy() {
+    this._cancelAnimation();
+    this._clearWheelSnapTimer();
+    this.container.removeEventListener('pointerdown', this._boundDragStart);
+    document.removeEventListener('pointermove', this._boundDragMove);
+    document.removeEventListener('pointerup', this._boundDragEnd);
+    document.removeEventListener('pointercancel', this._boundDragEnd);
+    this.container.removeEventListener('wheel', this._boundWheel);
+    this.container.removeEventListener('keydown', this._boundKeyDown);
     this.container.innerHTML = '';
   }
 }
