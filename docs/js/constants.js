@@ -170,7 +170,7 @@ export function getDifficultyByIndex(index) {
  */
 export const WheelConfig = Object.freeze({
   ITEM_COUNT: 3501,         // アイテム数（-1750 〜 +1750）
-  ITEM_EXTENT: 15,          // 各アイテムの高さ (px)
+  ITEM_EXTENT: 8,           // 各アイテムの高さ (px)
   CENTER_INDEX: 1750,       // 中央（0セント）のインデックス
   MIN_CENT: -1750,
   MAX_CENT: 1750,

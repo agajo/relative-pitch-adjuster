@@ -9,10 +9,19 @@ import {
 } from './wheel.js';
 import { WheelConfig } from './constants.js';
 
+
+test('one wheel tick is one cent with an 8px drag distance', () => {
+  const start = WheelConfig.CENTER_INDEX;
+
+  assert.equal(WheelConfig.ITEM_EXTENT, 8);
+  assert.equal(scrollIndexForDrag(start, -WheelConfig.ITEM_EXTENT), start + 1);
+  assert.equal(scrollIndexForDrag(start, WheelConfig.ITEM_EXTENT), start - 1);
+});
+
 test('drag position remains fractional until the picker reaches the next item', () => {
   const start = WheelConfig.CENTER_INDEX;
 
-  assert.equal(scrollIndexForDrag(start, -3), start + 0.2);
+  assert.equal(scrollIndexForDrag(start, -2), start + 0.25);
   assert.equal(selectedIndexForScroll(start + 0.49), start);
   assert.equal(selectedIndexForScroll(start + 0.5), start + 1);
 });

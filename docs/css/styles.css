@@ -225,8 +225,8 @@ button,
   top: 50%;
   left: 0;
   width: 100%;
-  height: 15px;
-  margin-top: -7.5px;
+  height: 8px;
+  margin-top: -4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -236,17 +236,17 @@ button,
 
 .wheel-item__bar {
   width: 62%;
-  height: 4px;
+  height: 2px;
   border-radius: 9999px;
-  opacity: 0.58;
+  opacity: 0.52;
   box-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
   transition: width 100ms ease, height 100ms ease, opacity 100ms ease;
 }
 
 .wheel-item--selected .wheel-item__bar {
   width: 78%;
-  height: 6px;
-  opacity: 1;
+  height: 3px;
+  opacity: 0.95;
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
 

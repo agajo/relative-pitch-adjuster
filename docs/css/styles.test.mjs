@@ -21,3 +21,19 @@ test('wheel gestures are contained within the picker control', () => {
     /\.wheel-container \{[^}]*touch-action:\s*none;[^}]*overscroll-behavior:\s*contain;/s
   );
 });
+
+
+test('wheel tick marks stay compact and light for the 8px item extent', () => {
+  assert.match(
+    css,
+    /\.wheel-item \{[^}]*height:\s*8px;[^}]*margin-top:\s*-4px;/s
+  );
+  assert.match(
+    css,
+    /\.wheel-item__bar \{[^}]*height:\s*2px;[^}]*opacity:\s*0\.52;/s
+  );
+  assert.match(
+    css,
+    /\.wheel-item--selected \.wheel-item__bar \{[^}]*height:\s*3px;[^}]*opacity:\s*0\.95;/s
+  );
+});
